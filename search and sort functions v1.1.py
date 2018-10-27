@@ -1,13 +1,8 @@
-from canteen_database import canteen_db 
-
-# list of all canteens and stalls
-filtered_list=[('Food Court 1', 'Stall 101'), ('Food Court 1', 'Stall 102'), ('Food Court 1', 'Stall 103'), ('Food Court 1', 'Stall 104'), ('Food Court 1', 'Stall 105'), ('Food Court 1', 'Stall 106'), ('Food Court 1', 'Stall 107'), ('Food Court 1', 'Stall 108'), ('Food Court 1', 'Stall 109'), ('Food Court 2', 'Stall 201'), ('Food Court 2', 'Stall 202'), ('Food Court 2', 'Stall 203'), ('Food Court 2', 'Stall 204'), ('Food Court 2', 'Stall 205'), ('Food Court 2', 'Stall 206'), ('Food Court 2', 'Stall 207'), ('Food Court 2', 'Stall 208'), ('Food Court 2', 'Stall 209'), ('Food Court 2', 'Stall 210'), ('Food Court 9', 'Stall 901'), ('Food Court 9', 'Stall 902'), ('Food Court 9', 'Stall 903'), ('Food Court 9', 'Stall 904'), ('Food Court 9', 'Stall 905'), ('Food Court 9', 'Stall 906'), ('Food Court 9', 'Stall 907'), ('Food Court 9', 'Stall 908'), ('Food Court 9', 'Stall 909'), ('Food Court 11', 'Stall 1101'), ('Food Court 11', 'Stall 1102'), ('Food Court 11', 'Stall 1103'), ('Food Court 11', 'Stall 1104'), ('Food Court 11', 'Stall 1105'), ('Food Court 11', 'Stall 1106'), ('Food Court 13', 'Stall 1301'), ('Food Court 13', 'Stall 1302'), ('Food Court 13', 'Stall 1303'), ('Food Court 13', 'Stall 1304'), ('Food Court 13', 'Stall 1305'), ('Food Court 13', 'Stall 1306'), ('Food Court 13', 'Stall 1307'), ('Food Court 13', 'Stall 1308'), ('Food Court 14', 'Stall 1401'), ('Food Court 14', 'Stall 1402'), ('Food Court 14', 'Stall 1403'), ('Food Court 14', 'Stall 1404'), ('Food Court 14', 'Stall 1405'), ('Food Court 14', 'Stall 1406'), ('Food Court 16', 'Stall 1601'), ('Food Court 16', 'Stall 1602'), ('Food Court 16', 'Stall 1603'), ('Food Court 16', 'Stall 1604'), ('Food Court 16', 'Stall 1605'), ('Foodgle Food Court', 'Foodgle 1'), ('Foodgle Food Court', 'Foodgle 2'), ('Foodgle Food Court', 'Foodgle 3'), ('Foodgle Food Court', 'Foodgle 4'), ('Foodgle Food Court', 'Foodgle 5'), ('Foodgle Food Court', 'Foodgle 6'), ('Foodgle Food Court', 'Foodgle 7'), ('Foodgle Food Court', 'Foodgle 8'), ('Foodgle Food Court', 'Foodgle 9'), ('North Hill Food Court', 'NH 1'), ('North Hill Food Court', 'NH 2'), ('North Hill Food Court', 'NH 3'), ('North Hill Food Court', 'NH 4'), ('North Hill Food Court', 'NH 5'), ('North Hill Food Court', 'NH 6'), ('North Hill Food Court', 'NH 7'), ('North Hill Food Court', 'NH 8'), ('Pioneer Food Court', 'Pioneer 1'), ('Pioneer Food Court', 'Pioneer 2'), ('Pioneer Food Court', 'Pioneer 3'), ('Pioneer Food Court', 'Pioneer 4'), ('Pioneer Food Court', 'Pioneer 5'), ('Pioneer Food Court', 'Pioneer 6'), ('Pioneer Food Court', 'Pioneer 7'), ('Pioneer Food Court', 'Pioneer 8'), ('Pioneer Food Court', 'Pioneer 9'), ('Pioneer Food Court', 'Pioneer 10'), ('Pioneer Food Court', 'Pioneer 11'), ('Pioneer Food Court', 'Pioneer 12')]
-# various options of food types
-foodtype=('Halal','Vegetarian','Indian','Vietnamese','Western','Chinese','Indian Vegetarian','Japanese','Korean')
+from canteen_database import *
 
 # function that asks user for input of food type
 # user input int value of 0 to 9
-# returns string of the corresponding food type
+# returns list with strings of the corresponding food types, then feed into search_by_food
 def foodtype_input():
   # lists of food types for displaying in a neat 3 x 3 table
   foodtype_print=[['1 - Halal','2 - Vegetarian','3 - Indian'],['4 - Vietnamese','5 - Western','6 - Chinese'],['7 - Indian Vegetarian','8 - Japanese','9 - Korean'],['0 - All Food']]
@@ -25,10 +20,11 @@ def foodtype_input():
     print('')
     try: 
       food_input_int=list(map(int,food_input_str.rstrip().split()))
-      if 0 not in food_input_int and len(food_input_int)>=1:
+      food_input_int.sort()
+      if 0 not in food_input_int and len(food_input_int)>=1 and food_input_int[-1]<10:
         food_choice = [foodtype[c-1] for c in food_input_int if c in range(1,10)]
         break
-        # if user selects all food, add 
+        # if user selects all food, return foodtype var that contains all food
       elif food_input_int[0]==0 and len(food_input_int)==1:
         print("Showing selections for all food")
         print('')
@@ -44,7 +40,7 @@ def foodtype_input():
     
 # function that asks user for input of price range, 
 # accepts min and max amount as integers separated by space
-# returns [min,max]        
+# returns [min,max], can then use as input in search_by_price
 def pricerange_input():
   print("Please input your budget ($) \n       [min amount] [max amount]")
   while True:
@@ -126,9 +122,10 @@ def sort_by_rating(filter_db,db):
 # function to filter by rating
 # function to sort by price
 
-
+######################################
+#######
 #foodname=foodtype_input()
-# searchprice = pricerange_input()
-# filtered_list=search_by_price(searchprice,filtered_list,canteen_db)
-# filtered_list=search_by_food(foodname,filtered_list,canteen_db)
+#searchprice = pricerange_input()
+#filtered_list=search_by_price(searchprice,filtered_list,canteen_db)
+#filtered_list=search_by_food(foodname,filtered_list,canteen_db)
 # sort_by_rating(filtered_list,canteen_db)
