@@ -109,14 +109,14 @@ def sort_by_rating(filter_db,db):
   print("Showing results with highest rating first\n")
   for canteen , stall in filter_db:
     stalls_rating_db[(canteen,stall)]=db[canteen]['Stalls'][stall][0]
-  sorted_list_by_rating=[(k, stalls_rating_db[k]) for k in sorted(stalls_rating_db, key=stalls_rating_db.get, reverse=True)]
+  sorted_list_by_rating=[k for k in sorted(stalls_rating_db, key=stalls_rating_db.get, reverse=True)]
   # sorted will sort the dict based on the key, key=dict.get retrieves the values from each key, reverse=True will be descending.
   sort_by_rating_filtered=[]
-  for keys,rating in sorted_list_by_rating:
+  for keys in sorted_list_by_rating:
     canteen=keys[0]
     stall = keys[1]
     sort_by_rating_filtered.append((canteen,stall))
-    print_stall_data(db,canteen,stall)
+    #print_stall_data(db,canteen,stall)
   return sort_by_rating_filtered 
 
 ##################################
