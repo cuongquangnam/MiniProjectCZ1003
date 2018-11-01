@@ -1,3 +1,7 @@
+# please read the comments
+# if you find sth that weird, you can fix it with a double #, like this:
+# this is flase -> 
+## this is false
 import pygame, sys
 from pygame.locals import *
 
@@ -6,7 +10,22 @@ pygame.init()
 
 
 # stage 1: hello user
-# stage 2:
+# stage 2: ask user what they want to eat
+
+
+# stage 3: show the result of searching
+# in stage 3, user may want to search again (reason may be they misclicked, or just to choose another food)
+# so case 1: we need a BACK button to return to stage 2
+#    case 2: keep the main functions of stage 2, but display it on the screen of stage 3
+
+
+# stage 4: if user request to see the map, show them what we've got
+# in stage 4, they may want to zoom the map, drag the map to their proper position to observe,
+# so we need to calculate the mouse position and its relation to the current map
+# which may be different in scale and position, it needs a little bit of math (xd).
+# we also need a BACK button, ZOOM IN, ZOOM OUT, drag the map by mouse, by KEYS, or by DIRECTION buttons
+# to manipulate the scale and position of the map
+# ADD-ON feature: when moving the mouse around the map, the pop-up appears, showing where the mouse is
 
 def main():
     width = 900
@@ -57,16 +76,18 @@ def main():
         pygame.display.update()
         clock.tick(FPS)
 
-# def increase_stage(position, box)
 def start(): # hello user
     start_font1 = pygame.font.SysFont('Helvetica', 60)
     box1 = writeText(screen, "Welcome to NTU F&B", (255,255,255), None, start_font1, width//2, height//3)
 
-def writeText(screen, text, text_color, background, font, x_center, y_center):
-    textSurface = font.render(text, True, text_color, background)
-    textRect = textSurface.get_rect()
-    textRect.center = (x_center, y_center)
-    screen.blit(textSurface, textRect)
+# In case there are so many boxes with text in our interface, this function would work well
+# def writeText(screen, text, text_color, background, font, x_center, y_center):
+#     textSurface = font.render(text, True, text_color, background)
+#     textRect = textSurface.get_rect()
+#     textRect.center = (x_center, y_center)
+#     screen.blit(textSurface, textRect)
+
+
 # ask user what they want to eat
 #
 
