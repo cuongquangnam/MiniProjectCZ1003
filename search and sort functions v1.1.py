@@ -112,10 +112,9 @@ def sort_by_rating(filter_db,db):
   sorted_list_by_rating=[(k, stalls_rating_db[k]) for k in sorted(stalls_rating_db, key=stalls_rating_db.get, reverse=True)]
   # sorted will sort the dict based on the key, key=dict.get retrieves the values from each key, reverse=True will be descending.
   for stalls,rating in sorted_list_by_rating:
-    for canteen_name in db.keys():
-      for stall_name in db[canteen_name]['Stalls'].keys():
-        if stall_name==stalls:
-          print_stall_data(db,canteen_name,stall_name)    
+    for canteen , stall in filter_db:
+      if stall==stalls:
+        print_stall_data(db,canteen,stall)  
 
 ##################################
 ######## TO DO 
