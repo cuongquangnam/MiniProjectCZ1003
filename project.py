@@ -60,6 +60,12 @@ def main():
             map = pygame.image.load('ntumap(2).png')
             map = pygame.transform.scale(map, (width, height))
             screen.blit(map, (0,0))
+            
+            ## a small button to back to stage 1
+            button1 = pygame.Rect(width-30, 0, 30, 20)
+            pygame.draw.rect(screen, RED, button1)
+            if button1.collidepoint(mouse) and mouseClicked:
+                stage -= 1
 
         for event in pygame.event.get():
             mouse = pygame.mouse.get_pos()
