@@ -38,9 +38,9 @@ def main():
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
     pygame.display.set_caption('NTU F&B')
     stage = 1
-    mouseClicked = False
-
+    
     while True:
+        mouseClicked = False
         if stage == 1:
             # box 1
             font1 = pygame.font.SysFont("Arial", 50)
