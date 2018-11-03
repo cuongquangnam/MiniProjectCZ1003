@@ -107,31 +107,38 @@ def main():
                     if mouseClicked and hover:
                         selected_box[i] = not selected_box[i]
                         box_of_choices.remove(i)
+                        num_of_choices -= 1
                 else:
                     if hover:
                         box_color = (153, 217, 234)
                         box_border = (0, 0, 180)
-                        if mouseClicked:
-                            selected_box[i] = not selected_box[i]
-                            box_of_choices.append(i)
+                        if num_of_choices < 4:
+                            if mouseClicked:
+                                selected_box[i] = not selected_box[i]
+                                box_of_choices.append(i)
+                                num_of_choices += 1
+                                print(num_of_choices)
+                        else:
+                            drawTextTopLeft("Ebrima", "Maximum number of food reached!", 20, RED, None, width//20, height//5)
                 drawOptions(i, box_color, box_border)
 
             # Your current choice:
-            font_choice1 = pygame.font.SysFont("Corbel", 30)
-            choice_intro = font_choice1.render("Your current choice: ", True, BLACK)
-            screen.blit(choice_intro, (width//20, height//10))
+            drawTextTopLeft("Corbel", "Your current choice: ", 30, BLACK, None, width//20, height//10)
 
             # box of selected choices
-            name_of_choices = [food_list[i] for i in box_of_choices]
+            name_of_choices = [food_list[i] for i in box_of_choices] # get in the input of the search function
             choices =  "   " + ", ".join(name_of_choices)
             font_choice2 = pygame.font.SysFont("Maiandra GD", 25)
             text_choice = font_choice2.render(choices, True, BLACK)
             #box_text_choice = text_choice.get_rect()
-            box_of_choices_display = pygame.Rect(width//20, height//7, width//2.5, height//20)
-
+            box_of_choices_display = pygame.Rect(width//20, height//7, max(width//2.5, 360), height//20)
             pygame.draw.rect(screen, BLUE, box_of_choices_display, 3)
             screen.blit(text_choice, box_of_choices_display)
 
+            # vertical line
+            pygame.draw.line(screen, BLACK, (max(width//2, 400), height//8), (max(width//2, 400), height//(8/7)))
+
+            # budget
         if stage == 4:
             map = pygame.image.load('ntumap(2).png')
             map = pygame.transform.scale(map, (width, height))
@@ -159,8 +166,8 @@ def get_place(index):
     col = index % 3
     minx = width//20
     miny = height//4
-    box_width = min(100, width//8)
-    box_height = min(60, height//10)
+    box_width = max(100, width//8)
+    box_height = max(60, height//10)
     margin = min(20, width//40)
     x_pos = minx + col*(box_width + margin)
     y_pos = miny + row*(box_height + margin)
@@ -193,13 +200,9 @@ def drawOptions(index, color, border): # draw the box with its text in the middl
     drawBoxOption(box, color, border)
     screen.blit(text, textbox)
 
-class optionBox(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.text = text
-        self.selected = selected
-        self.box_color = box_color
-        self.box_border = box_border
-
+def drawTextTopLeft(font, text, size, color, background, x_pos, y_pos):
+    font1 = pygame.font.SysFont(font, size)
+    text1 = font1.render(text, True, color, background)
+    screen.blit(text1, (x_pos, y_pos))
 
 main()
