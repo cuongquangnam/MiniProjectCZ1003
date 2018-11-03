@@ -15,13 +15,15 @@ GREEN   = (  0, 255,   0)
 BLUE    = (  0,   0, 255)
 
 food_list = [
-    "yasuo",
-    "vayne",
-    "annie",
-    "galio",
-    "kayle",
-    "rakan",
-    "xayah"
+    "Halal",
+    "Vegetarian",
+    "Indian",
+    "Vietnamese",
+    "Western",
+    "Chinese",
+    "Indian Vegetarian",
+    "Japanese",
+    "Koean"
 ]
 # stage 1: hello user
 # stage 2: ask user what they want to eat
@@ -43,7 +45,7 @@ food_list = [
 
 def main():
     FPS = 60
-    global screen, clock, mouse, width, height
+    global screen, clock, mouse, width, height, mouseClicked, stage
     # all stage materials
     width = 900
     height = 648
@@ -54,10 +56,14 @@ def main():
     stage = 1
 
     # materials in stage 2
+    global num_of_choices, selected_box, locked, box_of_choices, click_low, low_rect
     selected_box = [False]*len(food_list)
     box_of_choices = []
     num_of_choices = 0
     locked = False
+    click_low = True
+    low_rect = pygame.Rect(0,0,10,30)
+    low_rect.center=(max(width/2, 400)+10, 3*height/16)
     while True:
         mouseClicked = False
 
@@ -70,86 +76,19 @@ def main():
             #     mouse = event.pos
             if event.type == MOUSEBUTTONDOWN:
                 mouseClicked = True
+
             if event.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 width, height = event.w, event.h
-
+        #stage 1
         if stage == 1:
-            # box 1
-            screen.fill(WHITE)
-            font1 = pygame.font.SysFont("Candara", 50)
-            text1 = font1.render("Welcome to NTU F&B", True, BLACK)
-            textbox1 = text1.get_rect()
-            textbox1.center = (width//2, height//3)
-            screen.blit(text1, textbox1)
-            # box 2
-            font2 = pygame.font.SysFont("Arial", 60)
-            text2 = font2.render("GET STARTED", True, (255, 200, 0), (30, 50, 140))
-            textbox2 = text2.get_rect()
-            textbox2.center = (width//2, height//1.5)
-            screen.blit(text2, textbox2)
-
-            if textbox2.collidepoint(mouse) and mouseClicked:
-                stage = 2
-
-        if stage == 2: # let them choose
-            screen.fill(WHITE)
-
-            # build boxes of options
-            for i in range(len(food_list)):
-                box_color = WHITE
-                box_border = BLACK
-                back_box = get_place(i)
-                hover = back_box.collidepoint(mouse)
-                if selected_box[i]:
-                    box_color = (255, 162, 100)
-                    box_border = (200, 120, 0)
-                    if mouseClicked and hover:
-                        selected_box[i] = not selected_box[i]
-                        box_of_choices.remove(i)
-                        num_of_choices -= 1
-                else:
-                    if hover:
-                        box_color = (153, 217, 234)
-                        box_border = (0, 0, 180)
-                        if num_of_choices < 4:
-                            if mouseClicked:
-                                selected_box[i] = not selected_box[i]
-                                box_of_choices.append(i)
-                                num_of_choices += 1
-                                print(num_of_choices)
-                        else:
-                            drawTextTopLeft("Ebrima", "Maximum number of food reached!", 20, RED, None, width//20, height//5)
-                drawOptions(i, box_color, box_border)
-
-            # Your current choice:
-            drawTextTopLeft("Corbel", "Your current choice: ", 30, BLACK, None, width//20, height//10)
-
-            # box of selected choices
-            name_of_choices = [food_list[i] for i in box_of_choices] # get in the input of the search function
-            choices =  "   " + ", ".join(name_of_choices)
-            font_choice2 = pygame.font.SysFont("Maiandra GD", 25)
-            text_choice = font_choice2.render(choices, True, BLACK)
-            #box_text_choice = text_choice.get_rect()
-            box_of_choices_display = pygame.Rect(width//20, height//7, max(width//2.5, 360), height//20)
-            pygame.draw.rect(screen, BLUE, box_of_choices_display, 3)
-            screen.blit(text_choice, box_of_choices_display)
-
-            # vertical line
-            pygame.draw.line(screen, BLACK, (max(width//2, 400), height//8), (max(width//2, 400), height//(8/7)))
-
-            # budget
+            stage1()
+        #stage 2
+        if stage==2:
+            stage2()
+        #stage4
         if stage == 4:
-            map = pygame.image.load('ntumap(2).png')
-            map = pygame.transform.scale(map, (width, height))
-            screen.blit(map, (0,0))
-
-            # a small button to back to stage 1
-            button1 = pygame.Rect(width-30, 0, 30, 20)
-            pygame.draw.rect(screen, RED, button1)
-            if button1.collidepoint(mouse) and mouseClicked:
-                stage = 1
-
+            stage4()
 
         pygame.display.update()
         clock.tick(FPS)
@@ -192,10 +131,10 @@ def drawRoundedRectangle(color, x, y, width, height, radius):
 
 def drawOptions(index, color, border): # draw the box with its text in the middle
     name = food_list[index]
-    font1 = pygame.font.SysFont("Calibri", 30)
+    box = get_place(index)      # find its proper place
+    font1 = pygame.font.SysFont("Calibri",box.width//7-1)
     text = font1.render(name, True, BLACK, color)
     textbox = text.get_rect()
-    box = get_place(index)      # find its proper place
     textbox.center = (int(box[0] + box[2]//2), int(box[1] + box[3]//2))
     drawBoxOption(box, color, border)
     screen.blit(text, textbox)
@@ -204,5 +143,92 @@ def drawTextTopLeft(font, text, size, color, background, x_pos, y_pos):
     font1 = pygame.font.SysFont(font, size)
     text1 = font1.render(text, True, color, background)
     screen.blit(text1, (x_pos, y_pos))
+def stage1():
+    global stage
+    # box 1
+    screen.fill(WHITE)
+    font1 = pygame.font.SysFont("Candara", 50)
+    text1 = font1.render("Welcome to NTU F&B", True, BLACK)
+    textbox1 = text1.get_rect()
+    textbox1.center = (width//2, height//3)
+    screen.blit(text1, textbox1)
+    # box 2
+    font2 = pygame.font.SysFont("Arial", 60)
+    text2 = font2.render("GET STARTED", True, (255, 200, 0), (30, 50, 140))
+    textbox2 = text2.get_rect()
+    textbox2.center = (width//2, height//1.5)
+    screen.blit(text2, textbox2)
+
+    if textbox2.collidepoint(mouse) and mouseClicked:
+        stage = 2
+def stage2():
+    global num_of_choices, low_rect, click_low
+    screen.fill(WHITE)
+
+    # build boxes of options
+    for i in range(len(food_list)):
+        box_color = WHITE
+        box_border = BLACK
+        back_box = get_place(i)
+        hover = back_box.collidepoint(mouse)
+        if selected_box[i]:
+            box_color = (255, 162, 100)
+            box_border = (200, 120, 0)
+            if mouseClicked and hover:
+                selected_box[i] = not selected_box[i]
+                box_of_choices.remove(i)
+                num_of_choices -= 1
+        else:
+            if hover:
+                box_color = (153, 217, 234)
+                box_border = (0, 0, 180)
+                if num_of_choices < 4:
+                    if mouseClicked:
+                        selected_box[i] = not selected_box[i]
+                        box_of_choices.append(i)
+                        num_of_choices += 1
+                        print(num_of_choices)
+                else:
+                    drawTextTopLeft("Ebrima", "Maximum number of food reached!", 20, RED, None, width//20, height//5)
+        drawOptions(i, box_color, box_border)
+
+    # Your current choice:
+    drawTextTopLeft("Corbel", "Your current choice: ", 30, BLACK, None, width//20, height//10)
+
+    # box of selected choices
+    name_of_choices = [food_list[i] for i in box_of_choices] # get in the input of the search function
+    choices =  "   " + ", ".join(name_of_choices)
+    font_choice2 = pygame.font.SysFont("Maiandra GD", 20)
+    text_choice = font_choice2.render(choices, True, BLACK)
+    #box_text_choice = text_choice.get_rect()
+    box_of_choices_display = pygame.Rect(width//20, height//7, max(width//2.5, 360), height//20)
+    pygame.draw.rect(screen, BLUE, box_of_choices_display, 3)
+    screen.blit(text_choice, box_of_choices_display)
+
+    # vertical line
+    pygame.draw.line(screen, BLACK, (max(width//2, 400), height//8), (max(width//2, 400), height//(8/7)))
+
+    # budget
+    drawTextTopLeft("Corbel","Your price range:", 30, BLACK, WHITE, max(width//2,400)+10,height//10)
+    pygame.draw.line(screen, BLACK, (max(width/2, 400)+10, 3*height/16),(width*7/8,3*height/16))
+    if click_low==False:
+        low_rect.center = (max(width/2, 400)+10, 3*height/16)
+    else:
+        if low_rect.collidepoint(mouse) and mouseClicked:
+            low_rect.center = (mouse[0],3*height/16)
+            click_low = True
+    pygame.draw.rect(screen, BLUE, low_rect)
+
+def stage4():
+    global stage
+    map = pygame.image.load('NTU Campus.png')
+    map = pygame.transform.scale(map, (width, height))
+    screen.blit(map, (0,0))
+
+    # a small button to back to stage 1
+    button1 = pygame.Rect(width-30, 0, 30, 20)
+    pygame.draw.rect(screen, RED, button1)
+    if button1.collidepoint(mouse) and mouseClicked:
+        stage = 1
 
 main()
