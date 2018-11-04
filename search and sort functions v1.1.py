@@ -2,10 +2,10 @@ from canteen_database import *
 
 # function that asks user for input of food type
 # user input int value of 0 to 9
-# returns list with strings of the corresponding food types, then feed into search_by_food
+# returns string of the corresponding food type
 def foodtype_input():
   # lists of food types for displaying in a neat 3 x 3 table
-  foodtype_print=[['1 - Halal','2 - Vegetarian','3 - Indian'],['4 - Vietnamese','5 - Western','6 - Chinese'],['7 - Indian Vegetarian','8 - Japanese','9 - Korean'],['0 - All Food']]
+  foodtype_print=[['1 - Halal','2 - Vegetarian','3 - Indian'],['4 - Vietnamese','5 - Western','6 - Chinese'],['7 - Indian Vegetarian','8 - Japanese','9 - Korean'],['10 - Fast Food','0 - All Food']]
   col_width = max(len(word) for row in foodtype_print for word in row) + 2  # padding
   print("What kinds of food do you want to eat? Enter [Foodtype1] [Foodtype2] etc")
   #print food options in 3 column table
@@ -21,8 +21,8 @@ def foodtype_input():
     try: 
       food_input_int=list(map(int,food_input_str.rstrip().split()))
       food_input_int.sort()
-      if 0 not in food_input_int and len(food_input_int)>=1 and food_input_int[-1]<10:
-        food_choice = [foodtype[c-1] for c in food_input_int if c in range(1,10)]
+      if 0 not in food_input_int and len(food_input_int)>=1 and food_input_int[-1]<11:
+        food_choice = [foodtype[c-1] for c in food_input_int if c in range(1,11)]
         break
         # if user selects all food, return foodtype var that contains all food
       elif food_input_int[0]==0 and len(food_input_int)==1:
@@ -40,7 +40,7 @@ def foodtype_input():
     
 # function that asks user for input of price range, 
 # accepts min and max amount as integers separated by space
-# returns [min,max], can then use as input in search_by_price
+# returns [min,max]        
 def pricerange_input():
   print("Please input your budget ($) \n       [min amount] [max amount]")
   while True:
@@ -109,25 +109,29 @@ def sort_by_rating(filter_db,db):
   print("Showing results with highest rating first\n")
   for canteen , stall in filter_db:
     stalls_rating_db[(canteen,stall)]=db[canteen]['Stalls'][stall][0]
-  sorted_list_by_rating=[k for k in sorted(stalls_rating_db, key=stalls_rating_db.get, reverse=True)]
+  sorted_list_by_rating=[(k, stalls_rating_db[k]) for k in sorted(stalls_rating_db, key=stalls_rating_db.get, reverse=True)]
   # sorted will sort the dict based on the key, key=dict.get retrieves the values from each key, reverse=True will be descending.
   sort_by_rating_filtered=[]
-  for keys in sorted_list_by_rating:
+  for keys,rating in sorted_list_by_rating:
     canteen=keys[0]
     stall = keys[1]
     sort_by_rating_filtered.append((canteen,stall))
-    #print_stall_data(db,canteen,stall)
-  return sort_by_rating_filtered 
+    print_stall_data(db,canteen,stall)
+  return sort_by_rating_filtered
+  
 
 ##################################
 ######## TO DO 
 # function to filter by rating
 # function to sort by price
 
-######################################
-#######
-#foodname=foodtype_input()
-#searchprice = pricerange_input()
-#filtered_list=search_by_price(searchprice,filtered_list,canteen_db)
-#filtered_list=search_by_food(foodname,filtered_list,canteen_db)
-# sort_by_rating(filtered_list,canteen_db)
+price_search=True
+rating_sort=True
+
+foodname=foodtype_input()
+filtered_list=search_by_food(foodname,filtered_list,canteen_db)
+if price_search:
+  searchprice = pricerange_input()
+  filtered_list=search_by_price(searchprice,filtered_list,canteen_db)
+if rating_sort:
+  filtered_list=sort_by_rating(filtered_list,canteen_db)
