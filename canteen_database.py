@@ -27,7 +27,7 @@ canteen_db={
       'Ayam Penyet': [3, 'Indonesian', 3], 
       'Economical Rice': [5, 'Chinese', 7], 
       'La Kopi': [4, 'Breakfast', 3], 
-      'Japanese - Western': [2, ['Japanese', 'Western'], 4], 
+      'Japanese - Western': [2, ['Western'], 4], 
       'Chicken Rice': [2, 'Chinese', 3], 
       'Stall 210': [5, 'Vietnamese', 5] }
   },
