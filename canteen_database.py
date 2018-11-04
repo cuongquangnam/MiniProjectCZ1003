@@ -147,7 +147,7 @@ canteen_db={
     'Operating hours':'7am to 9pm',
     'Telephone number':'NA',
     'Stalls':{
-      r"McDonald's": [5, 'Fast Food', 6], 
+      "McDonald's": [5, 'Fast Food', 6], 
       'Pizza Hut Express': [4, 'Western', 8], 
       'Subway': [3, 'Fast Food', 5], 
       'The Sandwich Guys': [3, 'Fast Food', 4], 
@@ -157,6 +157,13 @@ canteen_db={
       'Bakery Cuisine': [3, 'Fast Food', 3], 
       'Mr Bean': [3, 'Fast Food', 3]} 
   },  
+  'Koufu @ the South Spine':{
+    #'Location': (xx,yy),
+    'Operating hours': '7am to 9pm',
+    'Telephone number': 'NA',
+    'Stalls':{
+  }
+  
 }
 
 # list of all canteens and stalls
