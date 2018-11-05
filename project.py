@@ -15,6 +15,7 @@ GREEN   = (  0, 255,   0)
 BLUE    = (  0,   0, 255)
 BLUE1   = (130, 180, 250)
 ORANGE  = (240, 150,  50)
+L_GRAY  = (230, 230, 230)
 
 # input boxes
 validChars = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./"
@@ -22,17 +23,19 @@ shiftChars = '~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?'
 
 food_list = [
     "Bakery",
+    "Beverage",
     "Chinese",
+    "Dessert",
     "Fast food",
     "Halal",
     "Indian",
-    "Japanese",
-    "Korean",
-    "Sandwich",
+    "Mala",
+    "Mixed Rice",
     "Vegetarian",
-    "Vietnamese",
     "Western",
+    "Others"
 ]
+
 # stage 1: hello user
 # stage 2: ask user what they want to eat
 
@@ -73,6 +76,7 @@ def main():
     locked = False
     minBox = TextBox()
     maxBox = TextBox()
+    dishBox = TextBox()
     # rating
     # rating
     max_rating = 5
@@ -80,7 +84,7 @@ def main():
     # start of loop
     while True:
         mouseClicked = False
-        mouseClickedNotUp = False
+        mouseClickedUp = False
         shiftDown = False
         backspace = False
         space = False
@@ -94,7 +98,8 @@ def main():
             #     mouse = event.pos
             if event.type == MOUSEBUTTONDOWN:
                 mouseClicked = True
-                mouseClickedNotUp = True
+            if event.type == MOUSEBUTTONUP:
+                mouseClickedUp = True
             if event.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 width, height = event.w, event.h
@@ -106,33 +111,24 @@ def main():
                 if event.key in [pygame.K_RSHIFT, pygame.K_LSHIFT]:
                     shiftDown = False
             if event.type == pygame.KEYDOWN:
-                if minBox.active: minBox.add_chr(pygame.key.name(event.key))
-                if maxBox.active: maxBox.add_chr(pygame.key.name(event.key))
-                if event.key == pygame.K_SPACE:
-                    # textBox.text += " "
+                if event.key == K_SPACE:
                     space = True
                 if event.key in [pygame.K_RSHIFT, pygame.K_LSHIFT]:
                     shiftDown = True
+                    if dishBox.active and not dishBox.locked: dishBox.add_chr(pygame.key.name(event.key))
                 if event.key == pygame.K_BACKSPACE:
                     backspace = True
                     # textBox.text = textBox.text[:-1]
-
+                if minBox.active and not minBox.locked: minBox.add_chr(pygame.key.name(event.key))
+                if maxBox.active and not maxBox.locked: maxBox.add_chr(pygame.key.name(event.key))
+                if dishBox.active and not dishBox.locked: dishBox.add_chr(pygame.key.name(event.key))
         # stage 1
         if stage == 1:
-            # box 1
             screen.fill(WHITE)
-            font1 = pygame.font.SysFont("Candara", 50)
-            text1 = font1.render("Welcome to NTU F&B", True, BLACK)
-            textbox1 = text1.get_rect()
-            textbox1.center = (width//2, height//3)
-            screen.blit(text1, textbox1)
-            # box 2
-            font2 = pygame.font.SysFont("Arial", 60)
-            text2 = font2.render("GET STARTED", True, (255, 200, 0), (30, 50, 140))
-            textbox2 = text2.get_rect()
-            textbox2.center = (width//2, height//1.5)
-            screen.blit(text2, textbox2)
-            if textbox2.collidepoint(mouse) and mouseClicked:
+            submit("Candara", "Welcome to NTU Food", BLACK, None, 50, width//2, height//3)
+            box2 = submit("Arial", "GET START", (255,200,0), (30, 50, 140), 60, width//2, height//1.5)
+            if box2.collidepoint(mouse) and mouseClickedUp:
+                screen.fill(WHITE)
                 stage = 2
 
         #stage 2
@@ -156,7 +152,7 @@ def main():
                     if hover:
                         box_color = (153, 217, 234)
                         box_border = (0, 0, 180)
-                        if num_of_choices < 4:
+                        if num_of_choices < 3:
                             if mouseClicked:
                                 selected_box[i] = not selected_box[i]
                                 box_of_choices.append(i)
@@ -166,7 +162,7 @@ def main():
                 drawOptions(i, box_color, box_border)
 
             # Your current choice:
-            drawTextTopLeft("Corbel", "Your current choice: ", 30, BLACK, None, width//20, height//10)
+            drawTextTopLeft("Corbel", "Your type of food: ", 30, BLACK, None, width//20, height//10)
 
             # box of selected choices
             name_of_choices = [food_list[i] for i in box_of_choices] # get in the input of the search function
@@ -174,7 +170,7 @@ def main():
             font_choice2 = pygame.font.SysFont("Maiandra GD", 20)
             text_choice = font_choice2.render(choices, True, BLACK)
             # box_text_choice = text_choice.get_rect()
-            box_of_choices_display = pygame.Rect(width//20, height//7, max(width//2.5, 360), height//19)
+            box_of_choices_display = pygame.Rect(width//20, height//7, max(width//2.1, 360), height//19)
             pygame.draw.rect(screen, ORANGE, box_of_choices_display, 3)
             screen.blit(text_choice, box_of_choices_display)
 
@@ -183,26 +179,37 @@ def main():
 
             # budget
             drawTextTopLeft("Patalino Linotype", "Your budget:", 30, BLACK, None, width//1.7, height//10)
+
             # Minimum price
-            drawTextTopLeft("Patalino Linotype", "Min", 30, BLACK, None, width//1.7, height//6)
-            minBox.rect = pygame.Rect(width//1.55, height//6, 100, minBox.image.get_height())
+            drawTextTopLeft("Patalino Linotype", "Min ($)", 30, BLACK, None, width//1.7, height//6)
+            minBox.rect = pygame.Rect(width//1.45, height//6.5, 100, minBox.image.get_height())
             if mouseClicked:
                 if minBox.rect.collidepoint(mouse):
                     minBox.active = not minBox.active
                 else:
                     minBox.active = False
+            if len(minBox.text) == 6:
+                minBox.locked = True
+                drawTextTopLeft("Corbel", "Too many characters!", 15, RED, None, width//1.22, height//6)
+            else: minBox.locked = False
+
             minBox.color = BLUE if minBox.active else BLUE1
             if backspace and len(minBox.text) > 1: minBox.text = minBox.text[:-1]
             pygame.draw.rect(screen, minBox.color, minBox.rect, 2)
             screen.blit(minBox.image,  minBox.rect)
+
             # Maximum price
-            drawTextTopLeft("Patalino Linotype", "Max", 30, BLACK, None, width//1.7, height//4.2)
-            maxBox.rect = pygame.Rect(width//1.55, height//4.2, 100, maxBox.image.get_height())
+            drawTextTopLeft("Patalino Linotype", "Max ($)", 30, BLACK, None, width//1.7, height//4.2)
+            maxBox.rect = pygame.Rect(width//1.45, height//4.3, 100, maxBox.image.get_height())
             if mouseClicked:
                 if maxBox.rect.collidepoint(mouse):
                     maxBox.active = not maxBox.active
                 else:
                     maxBox.active = False
+            if len(maxBox.text) == 6:
+                maxBox.locked = True
+                drawTextTopLeft("Corbel", "Too many characters!", 15, RED, None, width//1.22, height//6)
+            else: maxBox.locked = False
             maxBox.color = BLUE if maxBox.active else BLUE1
             if backspace and len(maxBox.text) > 1: maxBox.text = maxBox.text[:-1]
             pygame.draw.rect(screen, maxBox.color, maxBox.rect, 2)
@@ -215,17 +222,61 @@ def main():
                 screen.blit(list_of_star[-2], list_of_star[j])
             for i in range(len(list_of_star[:-2])):
                 if list_of_star[i].collidepoint(mouse):
-                    print(i)
                     for j in range(1+i):
                         screen.blit(list_of_star[-1], list_of_star[j])
 
                     if mouseClicked:
                         current_rating = i+1
+            # let they type their dish
+            drawTextTopLeft("Corbel", "Your dish:", 30, BLACK, None, width//50, height//1.45)
+            dishBox.rect = pygame.Rect(width//6, height//1.45, width/1.3, dishBox.image.get_height())
+            if mouseClicked:
+                if dishBox.rect.collidepoint(mouse):
+                    dishBox.active = not dishBox.active
+                else:
+                    dishBox.active = False
+            if dishBox.active:
+                if backspace and len(dishBox.text) > 1: dishBox.text = dishBox.text[:-1]
+                if space: dishBox.text += " "
+                dishBox.color = BLUE
+            else: dishBox.color = BLUE1
 
+
+            pygame.draw.rect(screen, dishBox.color, dishBox.rect, 2)
+            screen.blit(dishBox.image,  dishBox.rect)
+            # submit button
+            submit_button = submit("Gill Sans MT", "SUBMIT", (200, 50, 30), None, 60, width//2, height//1.2)
+            submit_width, submit_height = submit_button[2] + width//50, submit_button[3] + 20
+            submit_box = pygame.Rect(0,0, submit_width, submit_height)
+            submit_box.center = (width//2, height//1.2)
+            pygame.draw.rect(screen, BLACK, submit_box, 3)
+            if submit_box.collidepoint(mouse):
+                pygame.draw.rect(screen, (150, 255, 200), submit_box)
+                if mouseClicked:
+                    stage = 3
+            submit("Gill Sans MT", "SUBMIT", (200, 50, 30), None, 60, width//2, height//1.2)
+
+        # stage 3: return results to user
+        # get input from stage 2: box_of_choices, minBox.text, maxBox.text, dishBox.text, current_rating
+        if stage == 3:
+            screen.fill(WHITE)
+            # FOOD
+            name_of_choices = ", ".join([food_list[i] for i in box_of_choices])
+            drawTextTopLeft("Calibri", "Food: " + name_of_choices, 25, BLACK, None, width//50, height//30)
+            # PRICE
+            price_range = "$" + minBox.text[1:] + " - $" + maxBox.text[1:]
+            drawTextTopLeft("Calibri", "Price: " + price_range, 25, BLACK, None, width//50, 3*height//30)
+            # RATING
+            drawTextTopLeft("Calibri", "Rating: " + str(current_rating), 25, BLACK, None, width//3, 3*height//30)
+
+
+            back = submit("Arial", "BACK", BLACK, L_GRAY, 15, width//1.3, height//10)
+            if back.collidepoint(mouse) and mouseClicked:
+                stage = 2
 
         # stage4: map
         if stage == 4:
-            map = pygame.image.load('NTU Campus.png')
+            map = pygame.image.load('ntumap(2).png')
             map = pygame.transform.scale(map, (width, height))
             screen.blit(map, (0,0))
 
@@ -251,8 +302,8 @@ def get_place(index):
     minx = width//20
     miny = height//4
     box_width = max(100, width//7)
-    box_height = max(60, height//10)
-    margin = min(20, width//40)
+    box_height = max(50, height//12)
+    margin = min(15, width//50)
     x_pos = minx + col*(box_width + margin)
     y_pos = miny + row*(box_height + margin)
     back_box = pygame.Rect(x_pos, y_pos, box_width, box_height)
@@ -277,7 +328,7 @@ def drawRoundedRectangle(color, x, y, width, height, radius):
 def drawOptions(index, color, border): # draw the box with its text in the middle
     name = food_list[index]
     box = get_place(index)      # find its proper place
-    font1 = pygame.font.SysFont("Calibri",box.width//7)
+    font1 = pygame.font.SysFont("Calibri",box.width//6)
     text = font1.render(name, True, BLACK, color)
     textbox = text.get_rect()
     textbox.center = (int(box[0] + box[2]//2), int(box[1] + box[3]//2))
@@ -298,6 +349,7 @@ class TextBox(pygame.sprite.Sprite):
         self.image = self.font.render("", True, [0, 0, 0])
         self.rect = self.image.get_rect()
         self.active = False
+        self.locked = False
         self.color = BLUE1
 
     def add_chr(self, char):
@@ -307,6 +359,8 @@ class TextBox(pygame.sprite.Sprite):
                 self.text += char
             elif char in validChars and shiftDown:
                 self.text += shiftChars[validChars.index(char)]
+            elif char == " ":
+                self.text += " "
         self.image = self.font.render(self.text, True, [0, 0, 0])
 
 def drawRating(max_rating):
@@ -328,7 +382,14 @@ def drawRating(max_rating):
         list_of_star.append(rect)
     return list_of_star + [goldenstar, bluestar]
 
+def submit(font, text, color, background, size, x_center, y_center):
+    font_text = pygame.font.SysFont(font, size)
+    textSrf = font_text.render(text, True, color, background)
+    textbox = textSrf.get_rect()
+    textbox.center = (x_center, y_center)
+    screen.blit(textSrf, textbox)
+    return textbox
 
-
-
+def process_input():
+    pass
 main()
