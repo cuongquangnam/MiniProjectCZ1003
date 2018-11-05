@@ -1,11 +1,13 @@
 import pandas as pd
 from pandas import DataFrame
 
-ReadExcel = pd.read_excel('canteen_db.xlsx')
-df = DataFrame(ReadExcel,columns=['Canteen','Stall','Food Type' , 'Menu Item', 'Price', 'Rating'])
+df = pd.read_excel('canteen_db.xlsx')
 df['Menu Item'] = df['Menu Item'].str.lower() #convert menu item column to lowercase for search
 
-#takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], rating = int(1 to 5) or 0 if not specified
+#takes in foodtype = ['Food1','food2' etc], if no input = []
+#pricerange = [lower, higher as floats/int], if no input = [0,0]
+#rating = int(1 to 5) or 0 if not specified
+#search = string or '' if no input 
 def searchfood(foodtype,pricerange,rating,search):
     #copy the dataframe to temporary. 
     search_df = df.copy()
@@ -14,7 +16,7 @@ def searchfood(foodtype,pricerange,rating,search):
         foodcond = search_df['Food Type'].isin(foodtype)
         search_df = search_df[foodcond]
     # filter by price range
-    if pricerange != []:
+    if pricerange != [0,0]:
         low_price = pricerange[0]
         high_price = pricerange[1] 
         pricecond1 = search_df['Price'] >= low_price
