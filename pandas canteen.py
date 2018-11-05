@@ -54,7 +54,9 @@ def sort_by_price(lst_index):
 #reduce the list to only ten
 def reduce_list(lst_index):
     return lst_index[0:9]
+#testing the functions
 result = searchfood(['Chinese Cuisine','Korean Cuisine'],[2.0,4.0],2,'noodle')
 result = sort_by_price(result)
 result = reduce_list(result)
+#from index --> DataFrame
 print(DataFrame(df, index = result))
