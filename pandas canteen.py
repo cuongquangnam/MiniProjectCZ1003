@@ -1,9 +1,7 @@
 import pandas as pd
 from pandas import DataFrame
 
-ReadExcel = pd.read_excel('canteen_db.xlsx')
-#df = DataFrame(ReadExcel,columns=['Canteen','Stall','Food Type' , 'Menu Item', 'Price', 'Rating'])
-df = ReadExcel
+df = pd.read_excel('canteen_db.xlsx')
 df['Menu Item'] = df['Menu Item'].str.lower() #convert menu item column to lowercase for search
 #takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], rating = int(1 to 5) or 0 if not specified
 def searchfood(foodtype, pricerange, rating, search):
