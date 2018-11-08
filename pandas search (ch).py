@@ -41,6 +41,6 @@ def searchfood(foodtype,pricerange,rating,search):
     
     return result
     
-    result= searchfood([],[0,0],1,'rice')
+result= searchfood([],[0,0],1,'rice')
     
-    result
+result
