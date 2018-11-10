@@ -1,6 +1,9 @@
 import pandas as pd
 from pandas import DataFrame
-from load_data import *
+
+df = pd.read_excel('canteen_db.xlsx')
+infocan = pd.read_excel('canteen details.xlsx')
+
 
 infocan = infocan.set_index('Canteen')
 df = df.set_index(['Canteen'])
@@ -33,10 +36,10 @@ def searchfood(foodtype, pricerange, rating, search, df):
     return search_df
 #function to sort by rating given the DataFrame filtered, the output is a list of indexes
 def sort_by_rating(filter_df):
-    return filter_df.sort_values("Rating")[:10]
+    return filter_df.sort_values("Rating")
 #function to sort by price given the DataFrame filtered, the output is a list of indexes
 def sort_by_price(filter_df):
-    return filter_df.sort_values("Price")[:10]
+    return filter_df.sort_values("Price")
 #function to sort by distance based on the user location, the filtered DataFrame and the DataFrame containing
 #information about the canteen
 def sort_by_location(user_loc, filter_df, infocan):
@@ -65,6 +68,19 @@ def sort_by_location(user_loc, filter_df, infocan):
         return pd.concat(frames)
     else:
         return pd.DataFrame()
+
 #result = searchfood([], [1,100], 1, 'Rice', df)
 #t = sort_by_location((441,430), result, infocan)
 #print(t)
+
+def display10(filter_df):
+    canteen_list_10 = filter_df.index.unique()[:10]
+    return filter_df.loc[canteen_list_10,:]
+
+result = searchfood([],[0.0,100.0],0,'', df)
+# t = sort_by_location((333,222), result, infocan)
+t = sort_by_price(result)
+u = sort_by_rating(result)
+# print(infocan.loc["Canteen 1"]["Image"])
+b = result.loc["Canteen 2"]
+print(b[b["Food Type"] == "Chinese"]["Stall"].unique())
