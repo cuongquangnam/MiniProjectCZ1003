@@ -383,7 +383,7 @@ def main():
             drawTextTopLeft("Calibri", "Operating hours: " + infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, width//50, 3*height//30)
             drawTextTopLeft("Calibri", "Address: " + infocan.loc[chosen_canteen, "Address"], 25, BLACK, None, width//50, 5*height//30)
             list_of_stalls1 = official_result.loc[chosen_canteen, "Stall"]
-            list_of_stalls = [list_of_stalls1] if type(list_of_stalls1) == str else list_of_stalls1
+            list_of_stalls = [list_of_stalls1] if type(list_of_stalls1) == str else list_of_stalls1.unique()
             print(list_of_stalls)
             chosen_stall1 = drawStallBoxes(list_of_stalls)
             if chosen_stall1 != "":
@@ -843,7 +843,7 @@ def drawStallBoxes(list_of_stalls):
     right = num_of_stalls//2
     left = num_of_stalls - right
     right_list = left_list = []
-
+    print(list_of_stalls)
     for i in range(left):
         y_pos = height//3 + (2*i+1)*height//30
         box = drawStallBox(list_of_stalls[i], left_pos, y_pos)
