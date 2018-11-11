@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pandas import DataFrame
 
 df = pd.read_excel('canteen_db.xlsx')
@@ -55,11 +56,15 @@ def sort_by_location(user_loc, filter_df, infocan):
         filter_df.at[loc,'Distance'] = distance
     #sort DataFrame according to the distance
     filter_df = filter_df.sort_values('Distance')
-    #select top 10 location to show the user
+    # select top 10 location to show the user
     count = 1
     for loc in filter_df.index.unique():
         a = filter_df.loc[loc]
-        frames.append(a)
+        if len(a.shape) == 1:
+            b = pd.DataFrame(a).T
+            frames.append(b)
+        else:
+            frames.append(a)
         if count == 10:
             break
         count += 1
@@ -69,18 +74,22 @@ def sort_by_location(user_loc, filter_df, infocan):
     else:
         return pd.DataFrame()
 
-#result = searchfood([], [1,100], 1, 'Rice', df)
-#t = sort_by_location((441,430), result, infocan)
-#print(t)
-
 def display10(filter_df):
     canteen_list_10 = filter_df.index.unique()[:10]
     return filter_df.loc[canteen_list_10,:]
 
-result = searchfood([],[0.0,100.0],0,'', df)
+def get_location(filter_df):
+    df = filter_df
+    if type(filter_df) == np.float64:
+        return [df]
+    else: return df
+
+result = searchfood(['Chinese'], [3,10], 1, 'fish', df)
+t = sort_by_location((441,430), result, infocan)
+# print(t)
+
+result = searchfood([],[0.0,100.0],0,'pork', df)
 # t = sort_by_location((333,222), result, infocan)
 t = sort_by_price(result)
 u = sort_by_rating(result)
-# print(infocan.loc["Canteen 1"]["Image"])
-b = result.loc["Canteen 2"]
-print(b[b["Food Type"] == "Chinese"]["Stall"].unique())
+print(result.loc["Canteen 9", "Stall"])
