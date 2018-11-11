@@ -246,6 +246,8 @@ def main():
                     stage = 3
         # stage 3: return results to user
         # get input from stage 2: box_of_choices, minBox.text, maxBox.text, dishBox.text, current_rating
+        if stage < 3:
+            official_result = []
         if stage == 3:
             screen.fill(WHITE)
             result = []
@@ -446,22 +448,26 @@ def main():
         if stage != 7: gate7 = ""
         if stage == 7:
             screen.fill(WHITE)
-            drawTextTopLeft("Calibri", "Your canteen: ", 25, BLACK, None, width//4, 5*height//30)
-            drawTextTopLeft("Calibri", chosen_canteen, 25, BLACK, None, width//2, 5*height//30)
-            drawTextTopLeft("Calibri", "Your stall: ", 25, BLACK, None, width//4, 7* height//30)
-            drawTextTopLeft("Calibri", chosen_stall, 25, BLACK, None, width//2, 7* height//30)
-            drawTextTopLeft("Calibri", "Your dish: ", 25, BLACK, None, width//4, 9*height//30)
-            drawTextTopLeft("Calibri", chosen_dish, 25, BLACK, None, width//2, 9*height//30)
-            drawTextTopLeft("Calibri", "Address: ", 25, BLACK, None, width//4, 11*height//4)
-            drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Address"], 25, BLACK, None, width//2, 11*height//4)
-            drawTextTopLeft("Calibri", "Capacity: ", 25, BLACK, None, width//4, 13*height//30)
-            drawTextTopLeft("Calibri", str(int(infocan.loc[chosen_canteen, "Capacity"])), 25, BLACK, None, width//2, 13*height//30)
-            drawTextTopLeft("Calibri", "Telephone: ", 25, BLACK, None, width//4, 15*height//30)
-            drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Telephone"], 25, BLACK, None, width//2, 15*height//30)
-            drawTextTopLeft("Calibri", "Operating hours: ", 25, BLACK, None, width//4, 17*height//30)
-            drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, width//2, 17*height//30)
-            drawTextTopLeft("Calibri", "Price: ", 25, BLACK, None, width//4, 19*height//30)
-            drawTextTopLeft("Calibri", "$" + str(chosen_price), 25, BLACK, None, width//2, 19*height//30)
+            left1 = width//8
+            left2 = width//3
+            top = 5
+            drawTextTopLeft("Calibri", "Your canteen: ", 25, BLACK, None, left1, top*height//30)
+            drawTextTopLeft("Calibri", chosen_canteen, 25, BLACK, None, left2, top*height//30)
+            drawTextTopLeft("Calibri", "Your stall: ", 25, BLACK, None, left1, (top+2)*height//30)
+            drawTextTopLeft("Calibri", chosen_stall, 25, BLACK, None, left2, (top+2)*height//30)
+            drawTextTopLeft("Calibri", "Your dish: ", 25, BLACK, None, left1, (top+4)*height//30)
+            drawTextTopLeft("Calibri", chosen_dish, 25, BLACK, None, left2, (top+4)*height//30)
+            drawTextTopLeft("Calibri", "Price: ", 25, BLACK, None, left1, (top+6)*height//30)
+            drawTextTopLeft("Calibri", "$" + str(chosen_price), 25, BLACK, None, left2, (top+6)*height//30)
+            drawTextTopLeft("Calibri", "Address: ", 25, BLACK, None, left1, (top+8)*height//30)
+            drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Address"], 25, BLACK, None, left2, (top+8)*height//30)
+            drawTextTopLeft("Calibri", "Capacity: ", 25, BLACK, None, left1, (top+10)*height//30)
+            drawTextTopLeft("Calibri", str(int(infocan.loc[chosen_canteen, "Capacity"])), 25, BLACK, None, left2, (top+10)*height//30)
+            drawTextTopLeft("Calibri", "Telephone: ", 25, BLACK, None, left1, (top+12)*height//30)
+            drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Telephone"], 25, BLACK, None, left2, (top+12)*height//30)
+            drawTextTopLeft("Calibri", "Operating hours: ", 25, BLACK, None, left1, (top+14)*height//30)
+            drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, left2, (top+14)*height//30)
+
             stage = backNext(stage, 6, 2, "")
 
 
