@@ -1,9 +1,11 @@
-import pygame, sys, time, math
+import pygame, sys, time, math, base64
 import numpy as np
 import pandas as pd
+import openpyxl
 from pygame.locals import *
 
 from function import *
+from input_box3 import *
 pygame.init()
 
 
@@ -40,7 +42,7 @@ food_list = [
 ]
 
 def main():
-    FPS = 120
+    FPS = 60
     global screen, clock, mouse, shiftDown, width, height, space, backspace, max_rating, mouseClicked, mouseClickedUp
     # all stage materials
     width = 900
@@ -90,6 +92,28 @@ def main():
 
     # stage 7:
     gate7 = ""
+
+    # stage 9: log in
+    username = TextInput()
+    password = TextInput1()
+    check9 = 0
+
+    # stage 10: Update
+    canteen_fix = TextInput()
+    stall_fix = TextInput()
+    dish_fix = TextInput()
+    canteen_fix_text = ""
+    stall_fix_text = ""
+    dish_fix_text = ""
+
+    # stage 11, 12, 13: Add, Edit, Remove
+    foodtype_fix = TextInput()
+    price_fix = TextInput()
+    rating_fix = TextInput()
+    allowed11 = 0
+    allowed12 = 0
+    allowed13 = 0
+
     # start of loop
     while True:
         mouseClicked = False
@@ -98,7 +122,8 @@ def main():
         backspace = False
         space = False
         pressed = pygame.key.get_pressed()
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             mouse = pygame.mouse.get_pos()
             if event.type == QUIT:
                 pygame.quit()
@@ -130,13 +155,28 @@ def main():
             cover = pygame.transform.scale(pygame.image.load("cover.jpg"), (900, 636))
             display_image(cover, 0, 0, width, height)
             drawTextCenter("Comic Sans MS", "NTU Food", YELLOW, None, 35, width//2, height//2, True)
-            box2 = drawTextCenter("Gadugi", "GET START", (255,255,200), None, 35, width//2, height//1.4, True)
+            box2 = pygame.Rect(0, 0, 250, 50)
+            box2.center = (width//2, height//1.4)
+            pygame.draw.rect(screen, (150, 150, 255), box2)
+            pygame.draw.rect(screen, BLACK, box2, 2)
+            drawTextCenter("Gadugi", "GET START", (255,255,200), None, 35, width//2, height//1.4, True)
             if box2.collidepoint(mouse):
-                display_image(cover, 0, 0, width, height)
-                drawTextCenter("Comic Sans MS", "NTU Food", YELLOW, None, 35, width//2, height//2, True)
+                pygame.draw.rect(screen, (105, 105, 200), box2)
                 drawTextCenter("Gadugi", "GET START", (255, 255, 200), None, 37, width//2, height//1.4, True)
+                pygame.draw.rect(screen, BLACK, box2, 2)
                 if mouseClickedUp:
                     stage = 2
+            box3 = pygame.Rect(0, 0, 250, 50)
+            box3.center = (width//2, height//1.2)
+            pygame.draw.rect(screen, (150, 150, 250), box3)
+            pygame.draw.rect(screen, BLACK, box3, 2)
+            drawTextCenter("Gadugi", "UPDATE", (255, 255, 200), None, 35, width//2, height//1.2, True)
+            if box3.collidepoint(mouse):
+                pygame.draw.rect(screen, (105, 105, 250), box3)
+                pygame.draw.rect(screen, BLACK, box3, 2)
+                drawTextCenter("Gadugi", "UPDATE", (255, 255, 200), None, 37, width//2, height//1.2, True)
+                if mouseClicked:
+                    stage = 9
 
         #stage 2
         if stage == 2:
@@ -244,6 +284,7 @@ def main():
                 drawTextCenter("Gadugi", "SUBMIT", WHITE, None, 35, width//2, height//1.2, False)
                 if mouseClickedUp:
                     stage = 3
+
         # stage 3: return results to user
         # get input from stage 2: box_of_choices, minBox.text, maxBox.text, dishBox.text, current_rating
         if stage < 3:
@@ -386,7 +427,6 @@ def main():
             drawTextTopLeft("Calibri", "Address: " + infocan.loc[chosen_canteen, "Address"], 25, BLACK, None, width//50, 5*height//30)
             list_of_stalls1 = official_result.loc[chosen_canteen, "Stall"]
             list_of_stalls = [list_of_stalls1] if type(list_of_stalls1) == str else list_of_stalls1.unique()
-            print(list_of_stalls)
             chosen_stall1 = drawStallBoxes(list_of_stalls)
             if chosen_stall1 != "":
                 chosen_stall = chosen_stall1
@@ -402,10 +442,18 @@ def main():
         if stage == 6:
             screen.fill(WHITE)
             data1 = official_result.loc[chosen_canteen]
-            data = data1[data1["Stall"] == chosen_stall]
-            dishes = data["Menu Item"]
-            prices = data["Price"]
-            min_price, max_price, avg_price = prices.min(), prices.max(), prices.mean()
+            dishes = []
+            prices = []
+            min_price = max_price = avg_price = 0
+            if len(data1.shape) == 1:
+                dishes = [data1[2]]
+                prices = [data1[3]]
+                min_price = max_price = avg_price = data1[3]
+            else:
+                data2 = data1[data1["Stall"] == chosen_stall]
+                dishes = data2["Menu Item"]
+                prices = data2["Price"]
+                min_price, max_price, avg_price = prices.min(), prices.max(), prices.mean()
             drawTextTopLeft("Calibri", "Your canteen: " + chosen_canteen, 25, BLACK, None, width//50, 2*height//30)
             drawTextTopLeft("Calibri", "Your stall: " + chosen_stall, 25, BLACK, None, width//2, 2*height//30)
             drawTextTopLeft("Calibri", "Minimum price: " + str(min_price), 25, BLACK, None, width//50, 4*height//30)
@@ -468,8 +516,234 @@ def main():
             drawTextTopLeft("Calibri", "Operating hours: ", 25, BLACK, None, left1, (top+14)*height//30)
             drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, left2, (top+14)*height//30)
 
-            stage = backNext(stage, 6, 2, "")
+            box11 = pygame.Rect(width - 110, 0, 110, 2)
+            pygame.draw.rect(screen, RED, box11, 2)
+            if mouseClicked and not box11.collidepoint(mouse): gate7 = "a"
+            stage = backNext(stage, 6, 8, gate7)
+        # Do you want to update infomation ?
+        if stage == 8:
+            screen.fill(WHITE)
+            box_width = 120
+            box_height = 60
+            font1 = pygame.font.SysFont("Comic Sans MS", 40)
+            # YES
+            center1 = (width//2 - 70, height//2)
+            yes_box = pygame.Rect(0,0,box_width, box_height)
+            yes_box.center = center1
+            pygame.draw.rect(screen, (150, 200, 255), yes_box)
+            if yes_box.collidepoint(mouse):
+                pygame.draw.rect(screen, ORANGE, yes_box)
+                if mouseClicked:
+                    stage = 9
+            pygame.draw.rect(screen, BLACK, yes_box, 1)
+            drawTextCenter("Comic Sans MS", "YES", BLACK, None, 40, width//2 - 70, height//2, False)
+            # NO
+            center2 = (width//2 + 70, height//2)
+            no_box = pygame.Rect(0,0,box_width, box_height)
+            no_box.center = center2
+            pygame.draw.rect(screen, (150, 200, 255), no_box)
+            if no_box.collidepoint(mouse):
+                pygame.draw.rect(screen, ORANGE, no_box)
+                if mouseClicked:
+                    stage = 1
+            pygame.draw.rect(screen, BLACK, no_box, 1)
+            drawTextCenter("Comic Sans MS", "NO", BLACK, None, 40, width//2 + 70, height//2, False)
+            # text
+            drawTextCenter("Corbel", "Do you want to update infomation?", BLACK, None, 45, width//2, height//2 - 140, False)
 
+        # log in
+        if stage != 9:
+            check9 = 0
+        if stage == 9:
+            screen.fill(WHITE)
+            font1 = pygame.font.SysFont("Calibri", 30)
+            drawTextCenter("Corbel", "You must log in to update information!", RED, None, 45, width//2, height//4, False)
+
+            # username
+            box1 = drawTextTopLeft("Calibri", "Username: ", 30, BLACK, None, width//3.5, height//2.3)
+            username_rect = pygame.Rect(box1.right + 20, height//2.3, 300, 30)
+            pygame.draw.rect(screen, BLACK, username_rect, 2)
+            username.rect = username_rect
+            username.update(events)
+            screen.blit(username.get_surface(), username.rect)
+            # password
+            drawTextTopLeft("Calibri", "Password: ", 30, BLACK, None, width//3.5, height//2)
+            password_rect = pygame.Rect(box1.right + 20, height//2, 300, 30)
+            pygame.draw.rect(screen, BLACK, password_rect, 2)
+            password.rect = password_rect
+            password.update(events)
+            screen.blit(password.get_surface(), password.rect)
+            # encode username and password
+            real_username = username.input_string[1:]
+            encoded_username = base64.b64encode(real_username.encode())
+            real_password = password.input_string
+            encoded_password = base64.b64encode(real_password.encode())
+
+            admin_accounts = list(admin_data["Admin"])
+            passwords = list(admin_data["Password"])
+            check1 = check_account(str(encoded_username), str(encoded_password), admin_accounts, passwords)
+
+            login_button = pygame.Rect(0, 0, 200, 50)
+            login_button.center = (width//2, height//1.5)
+            pygame.draw.rect(screen, (116, 153, 228), login_button)
+            if login_button.collidepoint(mouse):
+                pygame.draw.rect(screen, (66, 103, 178), login_button)
+                if mouseClicked:
+                    if check1 == 0: check9 = 2
+                    else: stage = 10
+            drawTextCenter("Gadugi", "LOG IN", WHITE, None, 40, width//2, height//1.5, True)
+            pygame.draw.rect(screen, BLACK, login_button, 2)
+            if check9 == 2:
+                drawTextTopLeft("Corbel", "Invalid username or password!", 20, RED, None, width//3.5, height//1.8)
+
+            home = pygame.Rect(width - 100, 0, 100, 40)
+            pygame.draw.rect(screen, (180, 180, 180), home)
+            if home.collidepoint(mouse):
+                pygame.draw.rect(screen, L_GRAY, home)
+                if mouseClickedUp:
+                    stage = 1
+            pygame.draw.rect(screen, BLACK, home, 1)
+            drawTextCenter("Calibri", "HOME", BLACK, None, 25, width - 50, 20, True)
+
+
+        if stage < 10:
+            canteen_fix_text = ""
+            stall_fix_text = ""
+            dish_fix_text = ""
+        if stage != 10:
+            canteen_fix.active = False
+            stall_fix.active = False
+            dish_fix.active = False
+        if stage == 10:
+            screen.fill(WHITE)
+            left = width//10
+            top = height//5
+            gap = height//10
+
+            box1 = drawTextTopLeft("Calibri", "Canteen: ", 30, BLACK, None, left, top)
+            canteen_rect = pygame.Rect(box1.right + 20, top, width//(4/3) - box1.w, 30)
+            pygame.draw.rect(screen, BLACK, canteen_rect, 2)
+            canteen_fix.rect = canteen_rect
+            canteen_fix.update(events)
+            screen.blit(canteen_fix.get_surface(), canteen_fix.rect)
+
+            drawTextTopLeft("Calibri", "Stall: ", 30, BLACK, None, left, top + gap)
+            stall_rect = pygame.Rect(box1.right + 20, top + gap, width//(4/3) - box1.w, 30)
+            pygame.draw.rect(screen, BLACK, stall_rect, 2)
+            stall_fix.rect = stall_rect
+            stall_fix.update(events)
+            screen.blit(stall_fix.get_surface(), stall_fix.rect)
+
+            drawTextTopLeft("Calibri", "Dish: ", 30, BLACK, None, left, top + gap*2)
+            dish_rect = pygame.Rect(box1.right + 20, top + gap*2, width//(4/3) - box1.w, 30)
+            pygame.draw.rect(screen, BLACK, dish_rect, 2)
+            dish_fix.rect = dish_rect
+            dish_fix.update(events)
+            screen.blit(dish_fix.get_surface(), dish_fix.rect)
+
+            button = pygame.Rect(0,0,width//5, height//10)
+            y_pos = height//1.5
+            def drawButton(stage, text, x_pos, color):
+                new_stage = stage
+                new_button = button
+                new_button.center = (x_pos, y_pos)
+                pygame.draw.rect(screen, color, new_button)
+                if new_button.collidepoint(mouse):
+                    pygame.draw.rect(screen, ORANGE, new_button)
+                    if mouseClickedUp:
+                        if text == "ADD":
+                            new_stage = 11
+                        elif text == "EDIT":
+                            new_stage = 12
+                        elif text == "REMOVE":
+                            new_stage = 13
+                pygame.draw.rect(screen, BLACK, new_button, 2)
+                drawTextCenter("Corbel", text, BLACK, None, 40, x_pos, y_pos, False)
+                return new_stage
+
+            stage_add = drawButton(stage, "ADD", width//4, (150, 255, 150))
+            stage_edit = drawButton(stage, "EDIT", width//2, BLUE1)
+            stage_remove = drawButton(stage, "REMOVE", width//(4/3), (255, 150, 150))
+            canteen_fix_text = canteen_fix.input_string[1:]
+            stall_fix_text = stall_fix.input_string[1:]
+            dish_fix_text = dish_fix.input_string[1:]
+            if canteen_fix_text == "" or stall_fix_text == "" or dish_fix_text == "":
+                drawTextCenter("Calibri", "Please fill in all 3 boxes.", BLUE, None, 25, width//2, height//2, False)
+            else:
+                stage = max(stage_add, stage_edit, stage_remove)
+
+
+        # ADD
+        if stage != 11:
+            allowed11 = 0
+        if stage == 11:
+            screen.fill(WHITE)
+            stage = backUpdate(stage)
+            info = (canteen_fix_text, stall_fix_text, dish_fix_text)
+            result = search(ws, info)
+            print(result)
+            if result != []:
+                drawTextCenter("Corbel", "Oops! It looks like we already have your suggestion.", BLACK, None, 30, width//2, height//6, False)
+                folder1 = pygame.image.load("folder1.png")
+                folder1_rect = folder1.get_rect()
+                folder1_rect.center = (width//2, height//1.7)
+                screen.blit(folder1, folder1_rect)
+            else:
+                box1 = drawTextTopLeft("Calibri", "Food Type: ", 30, BLACK, None, left, top)
+                foodtype_rect = pygame.Rect(box1.right + 20, top, width//(4/3) - box1.w, 30)
+                pygame.draw.rect(screen, BLACK, foodtype_rect, 2)
+                foodtype_fix.rect = foodtype_rect
+                foodtype_fix.update(events)
+                screen.blit(foodtype_fix.get_surface(), foodtype_fix.rect)
+
+                drawTextTopLeft("Calibri", "Price: ", 30, BLACK, None, left, top + gap)
+                price_rect = pygame.Rect(box1.right + 20, top + gap, width//(4/3) - box1.w, 30)
+                pygame.draw.rect(screen, BLACK, price_rect, 2)
+                price_fix.rect = price_rect
+                price_fix.update(events)
+                screen.blit(price_fix.get_surface(), price_fix.rect)
+
+                drawTextTopLeft("Calibri", "Rating: ", 30, BLACK, None, left, top + gap*2)
+                rating_rect = pygame.Rect(box1.right + 20, top + gap*2, width//(4/3) - box1.w, 30)
+                pygame.draw.rect(screen, BLACK, rating_rect, 2)
+                rating_fix.rect = rating_rect
+                rating_fix.update(events)
+                screen.blit(rating_fix.get_surface(), rating_fix.rect)
+
+                a1 = price_fix.input_string[1:].replace(".", "", 1)
+                a2 = rating_fix.input_string[1:]
+
+                check = a1.isdigit() and a2.isdigit() and int(a2) in range(0,6)
+
+                submit = pygame.Rect(0, 0, 200, 50)
+                submit.center = (width//2, height//1.5)
+                pygame.draw.rect(screen, BLUE1, submit)
+                if submit.collidepoint(mouse):
+                    pygame.draw.rect(screen, ORANGE, submit)
+                    if mouseClickedUp:
+                        if check:
+                            ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(a1), int(a2)])
+                            wb.save('Canteen_db - Copy.xlsx')
+                            stage = 14
+                        else:
+                            allowed11 = 2
+                pygame.draw.rect(screen, BLACK, submit, 2)
+                if allowed11 == 2:
+                    drawTextCenter("Calibri", "Please check your inputs again.", BLUE, None, 25, width//2, height//2, False)
+
+        # EDIT
+        if stage == 12:
+            screen.fill(WHITE)
+            stage = backUpdate(stage)
+
+        # REMOVE
+        if stage == 13:
+            screen.fill(WHITE)
+            stage = backUpdate(stage)
+
+        if stage == 14:
+            screen.fill(WHITE)
+            drawTextCenter("Gadugi", str(stage), BLACK, None, 50, width//2, height//2, False)
 
         pygame.display.update()
         clock.tick(FPS)
@@ -849,7 +1123,6 @@ def drawStallBoxes(list_of_stalls):
     right = num_of_stalls//2
     left = num_of_stalls - right
     right_list = left_list = []
-    print(list_of_stalls)
     for i in range(left):
         y_pos = height//3 + (2*i+1)*height//30
         box = drawStallBox(list_of_stalls[i], left_pos, y_pos)
@@ -923,6 +1196,24 @@ def switchPage(page):
     pygame.draw.lines(screen, BLACK, True, ((width//2 + space - dif, y_pos - dif), (width//2 + space + dif, y_pos), (width//2 + space - dif, y_pos + dif)), 2)
     return new_page
 
+def check_account(username, password, usernames, passwords):
+    try:
+        return usernames.index(username) == passwords.index(password)
+    except ValueError:
+        return False
+    return False
+
+def backUpdate(stage):
+    new_stage = stage
+    back = pygame.Rect(width - 100, 0, 100, 40)
+    pygame.draw.rect(screen, (180, 180, 180), back)
+    if back.collidepoint(mouse):
+        pygame.draw.rect(screen, L_GRAY, back)
+        if mouseClickedUp:
+            new_stage = 10
+    pygame.draw.rect(screen, BLACK, back, 1)
+    drawTextCenter("Calibri", "BACK", BLACK, None, 25, width - 50, 20, True)
+    return new_stage
 
 if __name__ == '__main__':
     main()

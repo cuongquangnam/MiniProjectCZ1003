@@ -1,15 +1,33 @@
 import pandas as pd
 import numpy as np
 from pandas import DataFrame
+import openpyxl
 
 df = pd.read_excel('canteen_db.xlsx')
 infocan = pd.read_excel('canteen details.xlsx')
-
+admin_data = pd.read_excel("Admin.xlsx")
+wb = openpyxl.load_workbook('Canteen_db - Copy.xlsx')
+ws = wb['Sheet1']
 
 infocan = infocan.set_index('Canteen')
 df = df.set_index(['Canteen'])
 #takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], the search term
 # rating = int(1 to 5) or 0 if not specified
+
+def search(ws, lst):
+    rows = []
+    for row_num in range (2, ws.max_row+1):
+        can = ws.cell(row = row_num, column = 1).value
+        stall = ws.cell(row = row_num, column = 3).value
+        food = ws.cell(row = row_num, column = 4).value
+        #if lst[2] == 'n' then we just need to assign a value to food
+        #suc that food == lst[2]
+        if lst[2] == 'n':
+            food = 'n'
+        if can == lst[0] and stall == lst[1] and food == lst[2]:
+            rows.append(row_num)
+    return rows
+
 def searchfood(foodtype, pricerange, rating, search, df):
     #copy the dataframe to temporary.
     search_df = df.copy()
@@ -84,12 +102,14 @@ def get_location(filter_df):
         return [df]
     else: return df
 
-result = searchfood(['Chinese'], [3,10], 1, 'fish', df)
+result = searchfood(['Western'], [5,5], 1, 'spaghetti', df)
 t = sort_by_location((441,430), result, infocan)
-# print(t)
+t1 = result.loc["NIE"]
+# print(type(t1[3]))
+
 
 result = searchfood([],[0.0,100.0],0,'pork', df)
 # t = sort_by_location((333,222), result, infocan)
 t = sort_by_price(result)
 u = sort_by_rating(result)
-print(result.loc["Canteen 9", "Stall"])
+# print(result.loc["Canteen 9", "Stall"])
