@@ -112,7 +112,6 @@ def main():
     rating_fix = TextInput()
     allowed11 = 0
     allowed12 = 0
-    allowed13 = 0
 
     # start of loop
     while True:
@@ -676,12 +675,15 @@ def main():
         # ADD
         if stage != 11:
             allowed11 = 0
+        if stage not in [11, 12, 13]:
+            foodtype_fix.input_string = " "
+            price_fix.input_string = " "
+            rating_fix.input_string = " "
         if stage == 11:
             screen.fill(WHITE)
             stage = backUpdate(stage)
             info = (canteen_fix_text, stall_fix_text, dish_fix_text)
             result = search(ws, info)
-            print(result)
             if result != []:
                 drawTextCenter("Corbel", "Oops! It looks like we already have your suggestion.", BLACK, None, 30, width//2, height//6, False)
                 folder1 = pygame.image.load("folder1.png")
@@ -722,28 +724,129 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(a1), int(a2)])
+                            ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
                             allowed11 = 2
                 pygame.draw.rect(screen, BLACK, submit, 2)
+                drawTextCenter("Corbel", "SUBMIT", BLACK, None, 40, width//2, height//1.5, True)
                 if allowed11 == 2:
                     drawTextCenter("Calibri", "Please check your inputs again.", BLUE, None, 25, width//2, height//2, False)
 
         # EDIT
+        if stage != 12:
+            allowed12 = 0
         if stage == 12:
             screen.fill(WHITE)
             stage = backUpdate(stage)
+            info = (canteen_fix_text, stall_fix_text, dish_fix_text)
+            result = search(ws, info)
+            if result == []:
+                file_not_found = pygame.image.load("filenotfound.png")
+                file_not_found_rect = file_not_found.get_rect()
+                file_not_found_rect.center = (width//2, height//2)
+                screen.blit(file_not_found, file_not_found_rect)
+            else:
+                box1 = drawTextTopLeft("Calibri", "Food Type: ", 30, BLACK, None, left, top)
+                foodtype_rect = pygame.Rect(box1.right + 20, top, width//(4/3) - box1.w, 30)
+                pygame.draw.rect(screen, BLACK, foodtype_rect, 2)
+                foodtype_fix.rect = foodtype_rect
+                foodtype_fix.update(events)
+                screen.blit(foodtype_fix.get_surface(), foodtype_fix.rect)
+
+                drawTextTopLeft("Calibri", "Price: ", 30, BLACK, None, left, top + gap)
+                price_rect = pygame.Rect(box1.right + 20, top + gap, width//(4/3) - box1.w, 30)
+                pygame.draw.rect(screen, BLACK, price_rect, 2)
+                price_fix.rect = price_rect
+                price_fix.update(events)
+                screen.blit(price_fix.get_surface(), price_fix.rect)
+
+                drawTextTopLeft("Calibri", "Rating: ", 30, BLACK, None, left, top + gap*2)
+                rating_rect = pygame.Rect(box1.right + 20, top + gap*2, width//(4/3) - box1.w, 30)
+                pygame.draw.rect(screen, BLACK, rating_rect, 2)
+                rating_fix.rect = rating_rect
+                rating_fix.update(events)
+                screen.blit(rating_fix.get_surface(), rating_fix.rect)
+
+                a1 = price_fix.input_string[1:].replace(".", "", 1)
+                a2 = rating_fix.input_string[1:]
+
+                check = a1.isdigit() and a2.isdigit() and int(a2) in range(0,6)
+
+                submit = pygame.Rect(0, 0, 200, 50)
+                submit.center = (width//2, height//1.5)
+                pygame.draw.rect(screen, BLUE1, submit)
+                if submit.collidepoint(mouse):
+                    pygame.draw.rect(screen, ORANGE, submit)
+                    if mouseClickedUp:
+                        if check:
+                            ws.cell(row = result[0], column = 6, value = int(a2))
+                            ws.cell(row = result[0], column = 5, value = float(price_fix.input_string[1:]))
+                            ws.cell(row = result[0], column = 1, value = foodtype_fix.input_string[1:])
+                            wb.save('Canteen_db - Copy.xlsx')
+                            stage = 14
+                        else:
+                            allowed12 = 2
+                pygame.draw.rect(screen, BLACK, submit, 2)
+                drawTextCenter("Corbel", "SUBMIT", BLACK, None, 40, width//2, height//1.5, True)
+                if allowed12 == 2:
+                    drawTextCenter("Calibri", "Please check or type your inputs again.", BLUE, None, 25, width//2, height//2, False)
 
         # REMOVE
         if stage == 13:
             screen.fill(WHITE)
             stage = backUpdate(stage)
+            drawTextCenter("Calibri", "Are you sure ?", BLACK, None, 40, width//2, height//2, False)
+            info = (canteen_fix_text, stall_fix_text, dish_fix_text)
+            result = search(ws, info)
+            submit = pygame.Rect(0, 0, 200, 50)
+            submit.center = (width//2, height//1.5)
+            pygame.draw.rect(screen, BLUE1, submit)
+            if submit.collidepoint(mouse):
+                pygame.draw.rect(screen, ORANGE, submit)
+                if mouseClickedUp:
+                    ws.delete_rows(result[0])
+                    wb.save('Canteen_db - Copy.xlsx')
+                    stage = 14
+            pygame.draw.rect(screen, BLACK, submit, 2)
+            drawTextCenter("Corbel", "SUBMIT", BLACK, None, 40, width//2, height//1.5, True)
 
         if stage == 14:
             screen.fill(WHITE)
-            drawTextCenter("Gadugi", str(stage), BLACK, None, 50, width//2, height//2, False)
+            box_width = 120
+            box_height = 60
+            font1 = pygame.font.SysFont("Comic Sans MS", 40)
+            drawTextCenter("Corbel", "Do you want to update again?", BLACK, None, 40, width//2, height//2.5, True)
+            # YES
+            center1 = (width//2 - 70, height//2)
+            yes_box = pygame.Rect(0,0,box_width, box_height)
+            yes_box.center = center1
+            pygame.draw.rect(screen, (150, 200, 255), yes_box)
+            if yes_box.collidepoint(mouse):
+                pygame.draw.rect(screen, ORANGE, yes_box)
+                if mouseClicked:
+                    stage = 10
+            pygame.draw.rect(screen, BLACK, yes_box, 1)
+            drawTextCenter("Comic Sans MS", "YES", BLACK, None, 40, width//2 - 70, height//2, False)
+            # NO
+            center2 = (width//2 + 70, height//2)
+            no_box = pygame.Rect(0,0,box_width, box_height)
+            no_box.center = center2
+            pygame.draw.rect(screen, (150, 200, 255), no_box)
+            if no_box.collidepoint(mouse):
+                pygame.draw.rect(screen, ORANGE, no_box)
+                if mouseClicked:
+                    stage = 15
+            pygame.draw.rect(screen, BLACK, no_box, 1)
+            drawTextCenter("Comic Sans MS", "NO", BLACK, None, 40, width//2 + 70, height//2, False)
+
+        if stage == 15:
+            screen.fill((110, 205, 227))
+            thankyou = pygame.image.load("thankyou.png")
+            thankyou_rect = thankyou.get_rect()
+            thankyou_rect.center = (width//2, height//2)
+            screen.blit(thankyou, thankyou_rect)
 
         pygame.display.update()
         clock.tick(FPS)
