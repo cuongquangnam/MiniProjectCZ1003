@@ -1082,39 +1082,40 @@ def get_active(box, active):
             new_active = False
     return new_active
 
+
 def generateMap():
-    hall1 = pygame.Rect(420, 430, 45, 90)
-    hall2 = pygame.Rect(410, 320, 75, 92)
-    hall3 = pygame.Rect(430, 200, 35, 30)
-    hall4 = pygame.Rect(350, 480, 43, 40)
-    hall5 = pygame.Rect(395, 520, 45, 25)
-    hall6 = pygame.Rect(480, 415, 50, 40)
-    hall7 = pygame.Rect(90, 420, 45, 60)
-    hall8 = pygame.Rect(495, 270, 58, 35)
-    hall9 = pygame.Rect(555, 240, 60, 30)
-    hall10 = pygame.Rect(617, 203, 40, 35)
-    hall11 = pygame.Rect(665, 207, 45, 40)
-    hall12 = pygame.Rect(395, 150, 40, 40)
-    hall13 = pygame.Rect(436, 150, 40, 40)
-    hall14 = pygame.Rect(475, 145, 45, 50)
-    hall15 = pygame.Rect(527, 150, 65, 30)
-    hall16 = pygame.Rect(390, 200, 35, 30)
-    std_hostel = pygame.Rect(600, 160, 60, 30)
-    pioneer = pygame.Rect(495, 525, 30, 30)
-    cresent = pygame.Rect(470, 495, 25, 30)
-    grad1 = pygame.Rect(705, 210, 25, 25)
-    grad2 = pygame.Rect(665, 175, 30, 25)
-    south = pygame.Rect(215, 380, 22, 70)
-    north = pygame.Rect(253, 260, 80, 80)
-    nie = pygame.Rect(220, 90, 140, 140)
-    north_hill = pygame.Rect(665, 255, 45, 30)
-    wave = pygame.Rect(583, 435, 60, 55)
+    hall1 = pygame.Rect(700, 391, 66, 52)
+    hall2 = pygame.Rect(546, 291, 110, 54)
+    hall3 = pygame.Rect(349, 192, 40, 20)
+    hall4 = pygame.Rect(580, 444, 86, 34)
+    hall5 = pygame.Rect(670, 440, 70, 30)
+    hall6 = pygame.Rect(655, 291, 100, 62)
+    hall7 = pygame.Rect(201, 572, 185, 45)
+    hall8 = pygame.Rect(523, 161, 90, 70)
+    hall9 = pygame.Rect(541, 101, 100, 50)
+    hall10 = pygame.Rect(620, 44, 65, 35)
+    hall11 = pygame.Rect(655, 20, 66, 25)
+    hall12 = pygame.Rect(241, 180, 40, 25)
+    hall13 = pygame.Rect(301, 148, 51, 27)
+    hall14 = pygame.Rect(338, 109, 70, 41)
+    hall15 = pygame.Rect(404, 71, 100, 45)
+    hall16 = pygame.Rect(299, 225, 100, 20)
+    tmrind = pygame.Rect(532, 29, 45, 30)
+    pioneer = pygame.Rect(764, 369, 36, 27)
+    cresent = pygame.Rect(800,368,55,25)
+    grad1 = pygame.Rect(676, 11, 46, 31)
+    grad2 = pygame.Rect(578,8, 68, 25)
+    south = pygame.Rect(181, 452, 300, 102)
+    north = pygame.Rect(139, 331, 180, 100)
+    nie = pygame.Rect(47, 238, 238, 67)
+    north_hill = pygame.Rect(245, 468, 74, 49)
+    wave = pygame.Rect(807, 251, 71, 55)
 
     list_of_box = [hall1, hall2, hall3, hall4, hall5, hall6, hall7, hall8, hall9, hall10,
-                    hall11, hall12, hall13, hall14, hall15, hall16, std_hostel, cresent, pioneer,
+                    hall11, hall12, hall13, hall14, hall15, hall16, tmrind, cresent, pioneer,
                     grad1, grad2, south, north, nie, north_hill, wave]
     list_of_name = ["Hall 1", "Hall 2", "Hall 3", "Hall 4", "Hall 5", "Hall 6", "Hall 7", "Hall 8", "Hall 9",
-                    "Hall 10", "Hall 11", "Hall 12", "Hall 13", "Hall 14", "Hall 15", "Hall 16", "Student hostel",
+                    "Hall 10", "Hall 11", "Hall 12", "Hall 13", "Hall 14", "Hall 15", "Hall 16", "Tamarind Hall",
                     "Pioneer Hall", "Cresent Hall", "Graduate 1", "Graduate 2", "South spine", "North spine", "NIE",
                     "North Hill", "The Wave"]
     return list_of_box, list_of_name
