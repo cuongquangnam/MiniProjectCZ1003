@@ -23,6 +23,8 @@ def get_distance_and_duration(address1, address2, mode):
     else:
         return[]
 
+
+#NOTE: THERE ARE THREE MODES: 'walking', 'driving', 'transit' (transit means the combination of walking and using buses)
 #get the directions from google map
 def get_directions(address1, geocode2, mode):
     directions_result = gmaps.directions(address1,\
