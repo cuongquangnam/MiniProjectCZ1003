@@ -23,50 +23,59 @@ def get_distance_and_duration(address1, address2, mode):
     else:
         return[]
 
-
-#NOTE: THERE ARE THREE MODES: 'walking', 'driving', 'transit' (transit means the combination of walking and using buses)
 #get the directions from google map
-def get_directions(address1, geocode2, mode):
+#There are threee selected modes: 'walking', 'driving', 'transit' (meaning there are three ways to implement)
+def get_directions(address1, address2, mode):
     directions_result = gmaps.directions(address1,\
     address2, mode = mode, departure_time = now)
     return directions_result
 
-#print the directions to the user (not transit) (meaning not using bus)
-def print_directions_not_transit(directions):
+#get the steps(not transit) (meaning not using bus)
+def get_steps_not_transit(directions):
     steps =  directions[0]['legs'][0]['steps']
+    #create a list of [{'direction':....,'duration':...,'distance':...} ]
+    lst_of_steps = []
+    i = 0
     for step in steps:
-        #print the instruction
-        print(step['html_instructions'].replace('</b>','').replace('<b>','').\
-          replace('</div>','').replace('<div style="font-size:0.9em">','. '))
+        lst_of_steps.append({})
+        lst_of_steps[i]['direction'] = step['html_instructions'].replace('</b>','').replace('<b>','').\
+          replace('</div>','').replace('<div style="font-size:0.9em">','. ')
         #print the duration of the instructions
-        print(step['duration']['value']//60 ,'minutes ', step['duration']['value']%60,'seconds')
+        lst_of_steps[i]['duration'] = str(step['duration']['value']//60) +' minutes ' + str(step['duration']['value']%60) +' seconds'
         #print the distance of the instructions
-        print(step['distance']['text'])
-
-#print out the directions to the user (transit) (meaning maybe using bus (or not))
-def print_directions_transit(directions):
+        lst_of_steps[i]['distance'] = step['distance']['text']
+        i += 1
+    return lst_of_steps
+#get the steps (transit) (meaning maybe using bus (or not))
+def get_steps_transit(directions):
     #in case there is no directions, but actually there are always directions!!!
     if directions != []:
+        #create a list of [{'direction':....,'duration':...,'distance':...} ]
+        lst_of_steps = []
+        i = 0
         steps = directions[0]['legs'][0]['steps']
         for step in steps:
+            lst_of_steps.append({})
             if step['travel_mode'] == 'TRANSIT':
                 details = step['transit_details']
-                print('Take ', details['line']['agencies'][0]['name'],' from',\
-                      details['departure_stop']['name'],' to', details['arrival_stop']['name'])
+                lst_of_steps[i]['direction'] = 'Take ' + details['line']['agencies'][0]['name'] +' from'+\
+                      details['departure_stop']['name']+' to'+ details['arrival_stop']['name']
             else:
                 #just cleaning the data from google maps html
-                print(step['html_instructions'].replace('</b>','').replace('<b>','').\
-                      replace('</div>','').replace('<div style="font-size:0.9em">','. '))
+                lst_of_steps[i]['direction'] = step['html_instructions'].replace('</b>','').replace('<b>','').\
+                      replace('</div>','').replace('<div style="font-size:0.9em">','. ')
             #print the duration of the instructions
-            print(step['duration']['value']//60 ,'minutes ', step['duration']['value']%60,'seconds')
+            lst_of_steps[i]['duration'] = str(step['duration']['value']//60) + 'minutes ' + str(step['duration']['value']%60) +'seconds'
             #print the distance of the instructions
-            print(step['distance']['text'])
-x = float(input('x?: '))
-y = float(input('y?: '))
-geocode1 = pixeltolatlng(x,y)
+            lst_of_steps[i]['distance'] = step['distance']['text']
+            i += 1
+    return lst_of_steps
+#x = float(input('x?: '))
+#y = float(input('y?: '))
+#geocode1 = pixeltolatlng(x,y)
 #print(geocode1)
-#directions = get_directions(geocode1,'North Spine Food Court Nanyang Technological University','transit')
-#print_distance_and_duration(geocode1,'Da Nang Vietnam','transit')
-#print(directions)
+directions = get_directions((1.345506145, 103.687889154),'North Spine Food Court Nanyang Technological University','walking')
+steps = get_steps_not_transit(directions)
+print(steps)
 #print_directions_transit(directions)
 #print_duration_and_time(directions)
