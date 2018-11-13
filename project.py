@@ -1,6 +1,7 @@
 import pygame, sys, time, math, base64
 import numpy as np
 import pandas as pd
+import datetime
 import openpyxl
 from pygame.locals import *
 
@@ -25,7 +26,7 @@ YELLOW  = (255, 255,   0)
 validChars = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./"
 shiftChars = '~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?'
 
-map = pygame.image.load('ntumap(2).png')
+map = pygame.image.load('ntumap(3).png')
 ratio_scale = 1.3
 initial_scale = 3309/900 # original width/scree width
 food_list = [
@@ -308,7 +309,8 @@ def main():
             price_sort = drawTextTopLeft("Calibri", "Price", 25, BLACK, None, dash1.right + 5, height//30)
             dash2 = drawTextTopLeft("Calibri", "/", 25, BLACK, None, price_sort.right + 5, height//30)
             distance_sort = drawTextTopLeft("Calibri", "Distance", 25, BLACK, None, dash2.right + 5, height//30)
-            choice_border = drawBorderCenter(distance_sort.right - rating_sort.left, 25, (distance_sort.right + rating_sort.left)//2, (dash1.top + dash1.bottom)//2, WHITE, 1)
+            choice_border = drawBorderCenter(distance_sort.right - rating_sort.left, 25,
+                                            (distance_sort.right + rating_sort.left)//2, (dash1.top + dash1.bottom)//2, WHITE, 1)
             if choice_border.collidepoint(mouse):
                 rating_active = get_active(rating_sort, rating_active)
                 price_active = get_active(price_sort, price_active)
@@ -383,16 +385,16 @@ def main():
             up, down, left, right = moveButtons()
             if pressed[pygame.K_UP] and (top_image <= 0) or up.collidepoint(mouse) and mouseClicked:
                 top_image += 30
-                time.sleep(0.08)
+                #time.sleep(0.02)
             if pressed[pygame.K_DOWN] and (top_image + image_height >= height) or down.collidepoint(mouse) and mouseClicked:
                 top_image -= 30
-                time.sleep(0.08)
+                time.sleep(0.02)
             if pressed[pygame.K_LEFT] and (left_image <= 0) or left.collidepoint(mouse) and mouseClicked:
                 left_image += 30
-                time.sleep(0.08)
+                time.sleep(0.02)
             if pressed[pygame.K_RIGHT] and (left_image + image_width >= width) or right.collidepoint(mouse) and mouseClicked:
                 left_image -= 30
-                time.sleep(0.08)
+                time.sleep(0.02)
 
             if mouseClicked:
                 if not buttonZone.collidepoint(mouse) and not moveZone.collidepoint(mouse) and not confirmZone.collidepoint(mouse):
@@ -480,7 +482,8 @@ def main():
             price1 = list_of_prices[(page-1)*num_of_boxes : page*num_of_boxes]
             list_of_display_dishes = []
             for i in range(len(menu1)):
-                dish_price = drawDishBox(menu1[i], str(price1[i]), x_dish, x_price, dish_width, price_width, box_height, (9+2*i)*(height//30), WHITE, False)
+                dish_price = drawDishBox(menu1[i], str(price1[i]), x_dish, x_price,
+                                            dish_width, price_width, box_height, (9+2*i)*(height//30), WHITE, False)
                 list_of_display_dishes.append(dish_price)
 
             for dish_price in list_of_display_dishes:
@@ -514,6 +517,8 @@ def main():
             drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Telephone"], 25, BLACK, None, left2, (top+12)*height//30)
             drawTextTopLeft("Calibri", "Operating hours: ", 25, BLACK, None, left1, (top+14)*height//30)
             drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, left2, (top+14)*height//30)
+            current_time = datetime.datetime.now().time()
+            checkTime(current_time, chosen_canteen)
 
             box11 = pygame.Rect(width - 110, 0, 110, 2)
             pygame.draw.rect(screen, RED, box11, 2)
@@ -603,7 +608,6 @@ def main():
                     stage = 1
             pygame.draw.rect(screen, BLACK, home, 1)
             drawTextCenter("Calibri", "HOME", BLACK, None, 25, width - 50, 20, True)
-
 
         if stage < 10:
             canteen_fix_text = ""
@@ -847,6 +851,12 @@ def main():
             thankyou_rect = thankyou.get_rect()
             thankyou_rect.center = (width//2, height//2)
             screen.blit(thankyou, thankyou_rect)
+            box = drawTextCenter("Calibri", "Home", YELLOW, None, 40, width//2, height//1.5, False)
+            if box.collidepoint(mouse):
+                screen.blit(thankyou, thankyou_rect)
+                box = drawTextCenter("Calibri", "Home", YELLOW, None, 45, width//2, height//1.5, False)
+                if mouseClickedUp:
+                    stage = 1
 
         pygame.display.update()
         clock.tick(FPS)
@@ -1071,39 +1081,40 @@ def get_active(box, active):
         else:
             new_active = False
     return new_active
+
 def generateMap():
-    hall1 = pygame.Rect(700, 391, 66, 52)
-    hall2 = pygame.Rect(546, 291, 110, 54)
-    hall3 = pygame.Rect(349, 192, 40, 20)
-    hall4 = pygame.Rect(580, 444, 86, 34)
-    hall5 = pygame.Rect(670, 440, 70, 30)
-    hall6 = pygame.Rect(655, 291, 100, 62)
-    hall7 = pygame.Rect(201, 572, 185, 45)
-    hall8 = pygame.Rect(523, 161, 90, 70)
-    hall9 = pygame.Rect(541, 101, 100, 50)
-    hall10 = pygame.Rect(620, 44, 65, 35)
-    hall11 = pygame.Rect(655, 20, 66, 25)
-    hall12 = pygame.Rect(241, 180, 40, 25)
-    hall13 = pygame.Rect(301, 148, 51, 27)
-    hall14 = pygame.Rect(338, 109, 70, 41)
-    hall15 = pygame.Rect(404, 71, 100, 45)
-    hall16 = pygame.Rect(299, 225, 100, 20)
-    tmrind = pygame.Rect(532, 29, 45, 30)
-    pioneer = pygame.Rect(764, 369, 36, 27)
-    cresent = pygame.Rect(800,368,55,25)
-    grad1 = pygame.Rect(676, 11, 46, 31)
-    grad2 = pygame.Rect(578,8, 68, 25)
-    south = pygame.Rect(181, 452, 300, 102)
-    north = pygame.Rect(139, 331, 180, 100)
-    nie = pygame.Rect(47, 238, 238, 67)
-    north_hill = pygame.Rect(245, 468, 74, 49)
-    wave = pygame.Rect(807, 251, 71, 55)
+    hall1 = pygame.Rect(420, 430, 45, 90)
+    hall2 = pygame.Rect(410, 320, 75, 92)
+    hall3 = pygame.Rect(430, 200, 35, 30)
+    hall4 = pygame.Rect(350, 480, 43, 40)
+    hall5 = pygame.Rect(395, 520, 45, 25)
+    hall6 = pygame.Rect(480, 415, 50, 40)
+    hall7 = pygame.Rect(90, 420, 45, 60)
+    hall8 = pygame.Rect(495, 270, 58, 35)
+    hall9 = pygame.Rect(555, 240, 60, 30)
+    hall10 = pygame.Rect(617, 203, 40, 35)
+    hall11 = pygame.Rect(665, 207, 45, 40)
+    hall12 = pygame.Rect(395, 150, 40, 40)
+    hall13 = pygame.Rect(436, 150, 40, 40)
+    hall14 = pygame.Rect(475, 145, 45, 50)
+    hall15 = pygame.Rect(527, 150, 65, 30)
+    hall16 = pygame.Rect(390, 200, 35, 30)
+    std_hostel = pygame.Rect(600, 160, 60, 30)
+    pioneer = pygame.Rect(495, 525, 30, 30)
+    cresent = pygame.Rect(470, 495, 25, 30)
+    grad1 = pygame.Rect(705, 210, 25, 25)
+    grad2 = pygame.Rect(665, 175, 30, 25)
+    south = pygame.Rect(215, 380, 22, 70)
+    north = pygame.Rect(253, 260, 80, 80)
+    nie = pygame.Rect(220, 90, 140, 140)
+    north_hill = pygame.Rect(665, 255, 45, 30)
+    wave = pygame.Rect(583, 435, 60, 55)
 
     list_of_box = [hall1, hall2, hall3, hall4, hall5, hall6, hall7, hall8, hall9, hall10,
-                    hall11, hall12, hall13, hall14, hall15, hall16, tmrind, cresent, pioneer,
+                    hall11, hall12, hall13, hall14, hall15, hall16, std_hostel, cresent, pioneer,
                     grad1, grad2, south, north, nie, north_hill, wave]
     list_of_name = ["Hall 1", "Hall 2", "Hall 3", "Hall 4", "Hall 5", "Hall 6", "Hall 7", "Hall 8", "Hall 9",
-                    "Hall 10", "Hall 11", "Hall 12", "Hall 13", "Hall 14", "Hall 15", "Hall 16", "Tamarind Hall",
+                    "Hall 10", "Hall 11", "Hall 12", "Hall 13", "Hall 14", "Hall 15", "Hall 16", "Student hostel",
                     "Pioneer Hall", "Cresent Hall", "Graduate 1", "Graduate 2", "South spine", "North spine", "NIE",
                     "North Hill", "The Wave"]
     return list_of_box, list_of_name
@@ -1316,6 +1327,25 @@ def backUpdate(stage):
     pygame.draw.rect(screen, BLACK, back, 1)
     drawTextCenter("Calibri", "BACK", BLACK, None, 25, width - 50, 20, True)
     return new_stage
+
+def checkTime(current_time, chosen_canteen):
+    open = int(infocan.loc[chosen_canteen, "Open"])
+    closed = int(infocan.loc[chosen_canteen, "Closed"])
+    hour = current_time.hour
+    minute = current_time.minute
+    time = hour * 60 + minute
+    top = 21*(height//30)
+    left = width//8
+    if time >= closed * 60:
+        drawTextTopLeft("Calibri", "You should come back tommorow. It's already {}:{}".format(hour, minute), 25, BLUE, None, left, top)
+    elif time >= (closed - 1) * 60:
+        drawTextTopLeft("Calibri", "You still have {} minute(s) left to get some food.".format(60 - minute), 25, BLUE, None, left, top)
+    elif 13*60 + 30 >= time > 12*60:
+        drawTextTopLeft("Calibri", "Be quick! There will be many people in the queue.", 25, BLUE, None, left, top)
+    elif open * 60 > time:
+        drawTextTopLeft("Calibri", "Wow! You woke up so early! Have some exercises first.", 25, BLUE, None, left, top)
+    else:
+        drawTextTopLeft("Calibri", "Let's go!!! It's just {}:{:02d}.".format(hour, minute), 25, BLUE, None, left, top)
 
 if __name__ == '__main__':
     main()
