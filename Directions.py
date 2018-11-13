@@ -74,6 +74,7 @@ def get_steps_transit(directions):
 #y = float(input('y?: '))
 #geocode1 = pixeltolatlng(x,y)
 #print(geocode1)
+#NOTE: to write direction to a canteen, write in this form: 'Canteen X Nanyang Technological University, Singapore'
 directions = get_directions((1.345506145, 103.687889154),'North Spine Food Court Nanyang Technological University','walking')
 steps = get_steps_not_transit(directions)
 print(steps)
