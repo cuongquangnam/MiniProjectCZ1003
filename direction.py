@@ -3,7 +3,7 @@ import googlemaps
 import datetime
 
 gmaps = googlemaps.Client(key= 'AIzaSyD7UsgHTKortN9wRHK13_OFtiX9VRWf2ss')
-now = datetime.datetime(2018, 11, 16, 13, 00)
+now = datetime.now()
 #convert from pixel on the NTU Campus map to latitudes and longitudes
 def pixeltolatlng(x,y):
     lat = 1.356116549 - 0.000026134*y
