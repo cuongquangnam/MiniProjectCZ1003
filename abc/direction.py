@@ -1,4 +1,3 @@
-
 import googlemaps
 import datetime
 
@@ -10,21 +9,16 @@ def pixeltolatlng(x,y):
     lng = 103.676118654 + 0.000015694*x
     return (lat,lng)
 
-# get direction from address 1 to address 2 use certain mode of transport
-def get_distance_and_duration(address1, address2, mode):
-    distance_matrix = gmaps.distance_matrix(address1, address2, mode)
-    elements = distance_matrix['rows'][0]['elements']
-    if elements[0]['status'] != 'ZERO_RESULTS':
-        #get distance
-        distance = elements[0]['distance']['text'] #in meters
-        #get duration
-        duration = elements[0]['duration']['text'] #in second
-        return [distance,duration]
-    else:
-        return[]
+# get duration and distance based on the directions
+def get_duration_and_distance(directions):
+    if directions != []:
+        steps = directions[0]['legs'][0]
+        duration = steps['duration']['text']
+        distance = steps['distance']['text']
+        return [duration, distance]
 
 #get the directions from google map
-#There are threee selected modes: 'walking', 'driving', 'transit' (meaning there are three ways to implement)
+#There are threee selected modes: 'walking', 'driving', 'transit'
 def get_directions(address1, address2, mode):
     directions_result = gmaps.directions(address1, address2, mode = mode, departure_time = now)
     return directions_result
@@ -45,6 +39,7 @@ def get_steps_not_transit(directions):
         lst_of_steps[i]['distance'] = step['distance']['text']
         i += 1
     return lst_of_steps
+
 #get the steps (transit) (meaning maybe using bus (or not))
 def get_steps_transit(directions):
     #in case there is no directions, but actually there are always directions!!!
@@ -69,14 +64,3 @@ def get_steps_transit(directions):
             lst_of_steps[i]['distance'] = step['distance']['text']
             i += 1
     return lst_of_steps
-#x = float(input('x?: '))
-#y = float(input('y?: '))
-#geocode1 = pixeltolatlng(x,y)
-#print(geocode1)
-#NOTE: to write direction to a canteen, write in this form: 'Canteen X Nanyang Technological University, Singapore'
-# directions = get_directions((1.345506145, 103.687889154),'North Spine Food Court Nanyang Technological University','walking')
-# steps = get_steps_transit(directions)
-# print(steps)
-print(get_distance_and_duration((1.345506145, 103.687889154),'North Spine Food Court Nanyang Technological University','walking'))
-# #print_duration_and_time(directions)
-# print(directions)
