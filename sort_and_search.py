@@ -86,18 +86,31 @@ def get_location(filter_df):
         return [df]
     else:
         return df
-#this is to find low such that lst[low] <= target <= lst[low + 1]
-def binarySearch(filter_lst, target, low, high):
+
+def binarySearch(filter_lst, target, low, high, up):
     if high - 1 == low:
         return low
     mid = (low + high)//2
     if target >= filter_lst[mid] and target <= filter_lst[mid + 1]:
-        return mid
+        if up == False:
+            if target == filter_lst[mid]:
+                a = mid
+                while (target == filter_lst[a]) and (a >= low):
+                    a -= 1
+                return a+1
+            return mid + 1
+        else:
+            if target == filter_lst[mid + 1]:
+                a = mid + 1
+                while (target == filter_lst[a]) and (a <= high):
+                    a += 1
+                return a-1
+            return mid
     elif target < filter_lst[mid]:
-        return binarySearch(filter_lst, target, low, mid)
+        return binarySearch(filter_lst, target, low, mid, up)
     else:
-        return binarySearch(filter_lst, target, mid, high)
-#this is to return the price range between low_price and high_price
+        return binarySearch(filter_lst, target, mid, high, up)
+
 def searchPrice(low_price, high_price, filter_df):
     if (low_price > high_price):
         return pd.DataFrame()
@@ -113,12 +126,13 @@ def searchPrice(low_price, high_price, filter_df):
                 if low_price <= price_lst[0]:
                     low = 0
                 else:
-                    low = binarySearch(price_lst, low_price, 0,  length - 1) + 1
+                    low = binarySearch(price_lst, low_price, 0,  length - 1, False)
                 if high_price >= price_lst[length - 1]:
                     high = length - 1
                 else:
-                    high = binarySearch(price_lst, high_price, low, length - 1)
+                    high = binarySearch(price_lst, high_price, low, length - 1, True)
                 return filter_df.iloc[low: high + 1]
+
 
 #t = sort_by_location((441,430), result, infocan)
 #print(result.iloc[3:10])
