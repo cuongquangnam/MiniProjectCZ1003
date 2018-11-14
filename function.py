@@ -42,8 +42,8 @@ def searchfood(foodtype, pricerange, rating, search, df):
     pricecond2 = search_df['Price'] <= high_price
     search_df = search_df[ pricecond1 & pricecond2 ]
     # filter by rating, shows all above specified rating
-    if rating != 0:
         ratingcond = search_df['Rating'] >= rating
+        if rating != 0:
         search_df = search_df[ ratingcond ]
     # filter by menu Item
     if search != ' ':
@@ -53,6 +53,7 @@ def searchfood(foodtype, pricerange, rating, search, df):
             search_df = search_df[wordcond]
     # return the filtered DataFrame
     return search_df
+
 #function to sort by rating given the DataFrame filtered, the output is a list of indexes
 def sort_by_rating(filter_df):
     return filter_df.sort_values("Rating")
