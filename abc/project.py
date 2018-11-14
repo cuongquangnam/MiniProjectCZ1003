@@ -1078,6 +1078,7 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
+                            #edit the row
                             ws.cell(row = result[0], column = 6, value = int(a2))
                             ws.cell(row = result[0], column = 5, value = float(price_fix.input_string[1:]))
                             ws.cell(row = result[0], column = 1, value = foodtype_fix.input_string[1:])
@@ -1104,6 +1105,7 @@ def main():
                 pygame.draw.rect(screen, ORANGE, submit)
                 if mouseClickedUp:
                     if len(result) > 0:
+                        #remove the row
                         ws.delete_rows(result[0])
                         wb.save('Canteen_db - Copy.xlsx')
                     stage = 14
