@@ -6,10 +6,11 @@ import datetime
 import openpyxl
 from pygame.locals import *
 
-from function import *
+from sort_and_search import *
 from input_box3 import *
 from direction import *
 from spellchecker import *
+from Update import *
 
 
 pygame.init()
