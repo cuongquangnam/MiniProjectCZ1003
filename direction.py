@@ -9,16 +9,6 @@ def pixeltolatlng(x,y):
     lng = 103.676118654 + 0.000015694*x
     return (lat,lng)
 
-#get walking distance from address 1 to address 2
-#def get_distance(address1, address2):
-#    distance_matrix = gmaps.distance_matrix(address1, address2, 'walking')
-#    elements = distance_matrix['rows'][0]['elements']
-#    #get distance
-#    distance = elements[0]['distance']['value'] #in meters
-#    #get distance in kilometers
-#    distance /= 1000
-#    return distance
-
 #get the directions from google map
 #There are threee selected modes: 'walking', 'driving', 'transit' (meaning there are three ways to implement)
 def get_directions(address1, address2, mode):
@@ -67,9 +57,3 @@ def get_steps_transit(directions):
             lst_of_steps[i]['distance'] = step['distance']['text']
             i += 1
     return lst_of_steps
-#x = float(input('x?: '))
-#y = float(input('y?: '))
-#geocode1 = pixeltolatlng(x,y)
-#print(geocode1)
-#print_directions_transit(directions)
-#print_duration_and_time(directions)
