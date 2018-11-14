@@ -6,11 +6,11 @@ import datetime
 import openpyxl
 from pygame.locals import *
 
-from sort_and_search import *
+# extract functions and data from others file
+from function import *
 from input_box3 import *
 from direction import *
 from spellchecker import *
-from Update import *
 
 
 pygame.init()
@@ -26,13 +26,13 @@ ORANGE  = (240, 150,  50)
 L_GRAY  = (230, 230, 230)
 YELLOW  = (255, 255,   0)
 
-# input boxes
+# input boxes: characters
 validChars = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./"
 shiftChars = '~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?'
 
 map = pygame.image.load('ntumap(3).png')
 ratio_scale = 1.3
-initial_scale = 3309/900 # original width/scree width
+initial_scale = 3309/900 # original width/screen width
 food_list = [
     "B & D",
     "Chinese",
@@ -59,8 +59,7 @@ def main():
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
     pygame.display.set_caption('NTU Food')
 
-
-    # materials in stage 2
+    #stage 2
     # option part
     selected_box = [False]*len(food_list)
     box_of_choices = []
@@ -73,7 +72,7 @@ def main():
     # rating
     max_rating, current_rating = 5, 0
 
-    # stage 3
+    # stage 3: choose canteen and access to map
     rating_active = False
     price_active = False
     distance_active = False
@@ -96,9 +95,25 @@ def main():
     chosen_price = 0
     page = 1
 
-    # stage 7:
+    # stage 7: display everything user have chosen
     gate7 = ""
     direction_error = 0
+
+    # stage 7.5: map instruction
+    walk_active = 0
+    car_active = 0
+    bus_active = 0
+    direction_list1 = []
+    # scroll bar materials
+    scroll_bar_width = 20
+    scroll_bar_height = 80
+    scroll_bar_top = height//2.7
+    scroll_bar_color_active = (160, 160, 160)
+    scroll_bar_color_clicked = (105, 105, 105)
+    scroll_bar_region_color = (231, 231, 231)
+    scroll_bar_active = False
+    # convert gate
+    gate75 = ""
 
     # stage 9: log in
     username = TextInput()
@@ -120,19 +135,6 @@ def main():
     allowed11 = 0
     allowed12 = 0
 
-    # stage 16: map instruction
-    walk_active = 0
-    car_active = 0
-    bus_active = 0
-    direction_list1 = []
-    scroll_bar_width = 20
-    scroll_bar_height = 80
-    scroll_bar_top = height//2.7
-    scroll_bar_color_active = (160, 160, 160)
-    scroll_bar_color_clicked = (105, 105, 105)
-    scroll_bar_region_color = (231, 231, 231)
-    scroll_bar_active = False
-    gate75 = ""
     # start of loop
     while True:
         mouseClicked = False
@@ -149,13 +151,17 @@ def main():
                 pygame.quit()
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
+                # wheel scroll up
                 if event.button == 4:       scroll_bar_top = max(height//2.7, scroll_bar_top - 30)
+                # wheel scroll down
                 elif event.button == 5:     scroll_bar_top = min(height - scroll_bar_height, scroll_bar_top + 30)
+                # left-mouse click
                 elif event.button == 1:     mouseClicked = True
             elif event.type == MOUSEBUTTONUP:
                 if event.button == 1:       mouseClickedUp = True
             elif event.type == pygame.MOUSEMOTION:
                 mouseMove = True
+            # resize our screen
             if event.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 width, height = event.w, event.h
@@ -177,17 +183,19 @@ def main():
             cover = pygame.transform.scale(pygame.image.load("cover.jpg"), (900, 636))
             display_image(cover, 0, 0, width, height)
             drawTextCenter("Comic Sans MS", "NTU Food", YELLOW, None, 35, width//2, height//2, True)
+            # GET START
             box2 = pygame.Rect(0, 0, 250, 50)
             box2.center = (width//2, height//1.4)
             pygame.draw.rect(screen, (150, 150, 255), box2)
             pygame.draw.rect(screen, BLACK, box2, 2)
             drawTextCenter("Gadugi", "GET START", (255,255,200), None, 35, width//2, height//1.4, True)
-            if box2.collidepoint(mouse):
+            if box2.collidepoint(mouse): # box.collidepoint(mouse) returns True if the mouse is in the box and if otherwise, it returns False
                 pygame.draw.rect(screen, (105, 105, 200), box2)
                 drawTextCenter("Gadugi", "GET START", (255, 255, 200), None, 37, width//2, height//1.4, True)
                 pygame.draw.rect(screen, BLACK, box2, 2)
                 if mouseClickedUp:
-                    stage = 2
+                    stage = 2 # let's find some food!!!!
+            # UPDATE
             box3 = pygame.Rect(0, 0, 250, 50)
             box3.center = (width//2, height//1.2)
             pygame.draw.rect(screen, (150, 150, 250), box3)
@@ -197,18 +205,18 @@ def main():
                 pygame.draw.rect(screen, (105, 105, 250), box3)
                 pygame.draw.rect(screen, BLACK, box3, 2)
                 drawTextCenter("Gadugi", "UPDATE", (255, 255, 200), None, 37, width//2, height//1.2, True)
-                if mouseClicked:
+                if mouseClicked: # move to upload part directly
                     stage = 9
 
         #stage 2
         if stage == 2:
             screen.fill(WHITE)
-
-            # build boxes of options
+            # build boxes of options in the food lists
             for i in range(len(food_list)):
                 box_color = WHITE
                 box_border = BLACK
                 back_box = get_place(i) # postion of box i
+                # if the box_i has been chosen, its selected state changes
                 if selected_box[i]:
                     box_color = (255, 162, 100)
                     box_border = (200, 120, 0)
@@ -220,7 +228,8 @@ def main():
                     if back_box.collidepoint(mouse):
                         box_color = (153, 217, 234)
                         box_border = (0, 0, 180)
-                        if num_of_choices < 3:
+                        # set the limit of number of available boxes
+                        if num_of_choices < 4:
                             if mouseClicked:
                                 selected_box[i] = not selected_box[i]
                                 box_of_choices.append(i)
@@ -237,15 +246,13 @@ def main():
             choices =  "   " + ", ".join(name_of_choices)
             font_choice2 = pygame.font.SysFont("Maiandra GD", 25)
             text_choice = font_choice2.render(choices, True, BLACK)
-            # box_text_choice = text_choice.get_rect()
             box_of_choices_display = pygame.Rect(width//20, height//10, max(width//1.11, 360), height//15)
             pygame.draw.rect(screen, ORANGE, box_of_choices_display, 3)
             screen.blit(text_choice, box_of_choices_display)
 
             # budget
             drawTextTopLeft("Corbel", "Your budget:", 30, BLACK, None, width//20, height//1.7)
-
-            # Minimum price
+            # Minimum price input box
             drawTextTopLeft("Corbel", "Min ($)", 25, BLACK, None, width//15, height//1.53)
             minBox.rect = pygame.Rect(width//6, height//1.55, width//9, minBox.image.get_height())
             minBox.active = get_active(minBox.rect, minBox.active)
@@ -259,8 +266,7 @@ def main():
             else: minBox.color = BLUE1
             pygame.draw.rect(screen, minBox.color, minBox.rect, 2)
             screen.blit(minBox.image,  minBox.rect)
-
-            # Maximum price
+            # Maximum price input box
             drawTextTopLeft("Gadugi", "Max ($)", 25, BLACK, None, width//15, height//1.39)
             maxBox.rect = pygame.Rect(width//6, height//1.4, width//9, maxBox.image.get_height())
             maxBox.active = get_active(maxBox.rect, maxBox.active)
@@ -286,6 +292,7 @@ def main():
                         screen.blit(list_of_star[-1], list_of_star[j])
                     if mouseClicked:
                         current_rating = i+1
+
             # let they type their dish
             drawTextTopLeft("Gadugi", "Your dish:", 30, BLACK, None, width//20, height//2.1)
             dishBox.rect = pygame.Rect(width//5, height//2.1, width/1.34, dishBox.image.get_height())
@@ -297,6 +304,7 @@ def main():
             else: dishBox.color = BLUE1
             pygame.draw.rect(screen, dishBox.color, dishBox.rect, 2)
             screen.blit(dishBox.image,  dishBox.rect)
+
             # submit button
             submit = drawTextCenter("Gadugi", "SUBMIT", BLACK, WHITE, 35, width//2, height//1.2, False)
             submit_box = drawBorderCenter(submit[2] + 10, submit[3] + 6, submit.center[0], submit.center[1], BLACK, 3)
@@ -311,11 +319,13 @@ def main():
         # get input from stage 2: box_of_choices, minBox.text, maxBox.text, dishBox.text, current_rating
         if stage < 3:
             official_result = []
+            chosen_canteen = ""
         if stage == 3:
             screen.fill(WHITE)
             result = []
             # FOOD
             list_of_choices = [food_list[i] for i in box_of_choices]
+            # display choices
             name_of_choices = ", ".join(list_of_choices)
             drawTextTopLeft("Calibri", "Food: " + process_input(name_of_choices), 25, BLACK, None, width//50, height//30)
             # RATING
@@ -351,6 +361,7 @@ def main():
                 drawNotFound()
             else:
                 # PRICE
+                # convert type of input to proper type that can be searched in search function
                 price_range = validPrice(minBox.text, maxBox.text)
                 drawTextTopLeft("Calibri", "Price: " + displayValidPrice(price_range), 25, BLACK, None, width//50, 3*height//30)
                 if price_range == [None, None]:
@@ -359,6 +370,7 @@ def main():
                     result = searchfood(list_of_choices, price_range, current_rating, dishBox.text[1:], df)
                     if result.shape[0] == 0:
                         drawNotFound()
+                        # auto fix typo (do not work so efficiently due to lack of data)
                         if dishBox.text != " ":
                             spellChecker = SpellChecker()
                             recommend = spellChecker.correction(dishBox.text[1:])
@@ -371,28 +383,30 @@ def main():
                             if rect4.collidepoint(mouse):
                                 text4_active = font4.render(recommend, True, BLUE)
                                 screen.blit(text4_active, rect4)
+                                # if user clicked the recommend text, the whole progress restart
                                 if mouseClicked:
                                     dishBox.text = " " + recommend
                                     stage = 3
-
-
+                    # LOLLLLL, There are some results, display them
                     else:
+                        # result is sorted in different ways
                         if rating_active:
                             result = sort_by_rating(result)
                         if price_active:
                             result = sort_by_price(result)
                         if distance_active and place != "":
                             result = sort_by_location(process_place(place), result, infocan)
+                        # we only display the top 10 canteens of each criteria
                         result = display10(result)
                         canteen_list = result.index.unique()
                         image_list = [infocan.loc[canteen]["Image"] for canteen in canteen_list]
+                        # adding place != "" is to prevent cases when users did not type their location
                         chosen_canteen2 = drawCanteenBoxes(canteen_list, image_list, result, distance_active and place != "")
-
                         if chosen_canteen2 != "": chosen_canteen = chosen_canteen2
                         official_result = result
 
             drawTextTopLeft("Calibri", "Your canteen: " + chosen_canteen, 25, BLACK, None, width//50, 7*height//30)
-            # map button
+            # map button, click and we go to map section
             map_icon = pygame.transform.scale(pygame.image.load("location.jpg"), (55, 55))
             map_box = map_icon.get_rect()
             map_box.topleft = (width - 55, 26)
@@ -402,18 +416,26 @@ def main():
 
         # stage 4: map
         if stage == 4:
+            # generate hall areas
             list_of_boxes, list_of_names = generateMap()
+            # These zone is to prevent users click into their important part which may affect their experience
             buttonZone = drawBorderCenter(height//15, height//1.42 - height//1.6 + height//15, width//1.065, (height//1.6 + height//1.42)/2, RED, 1)
             moveZone = drawBorderCenter(3*height/15, 3*height/15, width//1.065, height//1.12, RED, 1)
             confirmZone = drawBorderCenter(600, 46, 300, height - 14, RED, 1)
+
             screen.fill(WHITE)
+            # zoom magnification
             ratio = initial_scale * (ratio_scale ** current_scale)
             map_copy = pygame.transform.scale(map, (int(3309/ratio), int(2339/ratio)))
             left_image, top_image, image_width, image_height = display_image(map_copy, top_image, left_image, width, height)
+            # process mouse returns the location of the mouse in the 900x636 map due to its original location in the map
             processed_mouse = processMouse(top_image, left_image, image_width, image_height, mouse)
+
+            # Zoom in and Zoom out
             zoomIn = zoomButton(width//1.065, height//1.6, True)
             zoomOut = zoomButton(width//1.065, height//1.42, False)
-            if (zoomIn or pressed[pygame.K_LEFTBRACKET]) and current_scale > -10:
+            # adding time.sleep(small_time) is to make the action would occur reasonably fast in the while loop
+            if (zoomIn or pressed[pygame.K_LEFTBRACKET]) and current_scale > -10: # maximum zoom level is 10
                 current_scale -= 1
                 left_image, top_image, image_width, image_height = zoom(1, top_image, left_image, image_width, image_height)
                 time.sleep(0.1)
@@ -435,10 +457,12 @@ def main():
                 left_image -= 30
                 time.sleep(0.02)
 
+            # get user location by let them click, not in some specific zones
             if mouseClicked:
                 if not buttonZone.collidepoint(mouse) and not moveZone.collidepoint(mouse) and not confirmZone.collidepoint(mouse):
                     user_location = str(processed_mouse)
                 hall_place = ""
+                # check if user location is in some special place in generateMap()
                 hall_place = checkMap(list_of_boxes, list_of_names, hall_place, processed_mouse)
             else:
                 checkMap(list_of_boxes, list_of_names, hall_place, processed_mouse)
@@ -454,26 +478,31 @@ def main():
             text = " Your location: " + user_location + " " + hall_place
             drawTextTopLeft("Gadugi", text, 25, BLACK, WHITE, left_location, height - 30)
 
-        # Show direction instructions
-
-
         # stage 5: stalls in canteen
         if stage < 5:
             chosen_stall = ""
         if stage == 5:
             gate5 = ""
             screen.fill(WHITE)
+            # CANTEEN INFORMATION
+            # NAME
             drawTextTopLeft("Calibri", "Your canteen: " + chosen_canteen, 25, BLACK, None, width//50, height//30)
+            # CAPACITY
             drawTextTopLeft("Calibri", "Capacity: " + str(int(infocan.loc[chosen_canteen, "Capacity"])), 25, BLACK, None, width//2, height//30)
+            # PHONE NUMBER
             drawTextTopLeft("Calibri", "Telephone: " + infocan.loc[chosen_canteen, "Telephone"], 25, BLACK, None, width//2, 3*height//30)
+            # AVAILABLE HOURS
             drawTextTopLeft("Calibri", "Operating hours: " + infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, width//50, 3*height//30)
+            # ADDRESS
             drawTextTopLeft("Calibri", "Address: " + infocan.loc[chosen_canteen, "Address"], 25, BLACK, None, width//50, 5*height//30)
+
+            # Process the name of the stall(s)
             list_of_stalls1 = official_result.loc[chosen_canteen, "Stall"]
             list_of_stalls = [list_of_stalls1] if type(list_of_stalls1) == str else list_of_stalls1.unique()
+            # display all stalls availale
             chosen_stall1 = drawStallBoxes(list_of_stalls)
             if chosen_stall1 != "":
                 chosen_stall = chosen_stall1
-
             drawTextTopLeft("Calibri", "Your stall: " + chosen_stall, 25, BLACK, None, width//50, 7*height//30)
             stage = backNext(stage, 3,6, chosen_stall)
 
@@ -542,25 +571,37 @@ def main():
             direction_error = 0
         if stage == 7:
             screen.fill(WHITE)
+            # variables
             left1 = width//8
+            # values
             left2 = width//3
             top = 5
+            # CANTEEN
             drawTextTopLeft("Calibri", "Your canteen: ", 25, BLACK, None, left1, top*height//30)
             drawTextTopLeft("Calibri", chosen_canteen, 25, BLACK, None, left2, top*height//30)
+            # STALL
             drawTextTopLeft("Calibri", "Your stall: ", 25, BLACK, None, left1, (top+2)*height//30)
             drawTextTopLeft("Calibri", chosen_stall, 25, BLACK, None, left2, (top+2)*height//30)
+            # DISH
             drawTextTopLeft("Calibri", "Your dish: ", 25, BLACK, None, left1, (top+4)*height//30)
             drawTextTopLeft("Calibri", chosen_dish, 25, BLACK, None, left2, (top+4)*height//30)
+            # PRICE
             drawTextTopLeft("Calibri", "Price: ", 25, BLACK, None, left1, (top+6)*height//30)
             drawTextTopLeft("Calibri", "$" + str(chosen_price), 25, BLACK, None, left2, (top+6)*height//30)
+            # ADDRESS
             drawTextTopLeft("Calibri", "Address: ", 25, BLACK, None, left1, (top+8)*height//30)
             drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Address"], 25, BLACK, None, left2, (top+8)*height//30)
+            # CAPACITY
             drawTextTopLeft("Calibri", "Capacity: ", 25, BLACK, None, left1, (top+10)*height//30)
             drawTextTopLeft("Calibri", str(int(infocan.loc[chosen_canteen, "Capacity"])), 25, BLACK, None, left2, (top+10)*height//30)
+            # PHONE NUMBER
             drawTextTopLeft("Calibri", "Telephone: ", 25, BLACK, None, left1, (top+12)*height//30)
             drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Telephone"], 25, BLACK, None, left2, (top+12)*height//30)
+            # AVAILABLE HOURS
             drawTextTopLeft("Calibri", "Operating hours: ", 25, BLACK, None, left1, (top+14)*height//30)
             drawTextTopLeft("Calibri", infocan.loc[chosen_canteen, "Operating hours"], 25, BLACK, None, left2, (top+14)*height//30)
+
+            # Access to current time and giving advices
             current_time = datetime.datetime.now().time()
             checkTime(current_time, chosen_canteen)
 
@@ -597,12 +638,13 @@ def main():
             pygame.draw.rect(screen, BLACK, b, 2)
             screen.blit(text_srf1, text_box1)
 
-
+            # change stages
             box11 = pygame.Rect(width - 110, 0, 110, 2)
             pygame.draw.rect(screen, WHITE, box11, 2)
             if mouseClicked and not box11.collidepoint(mouse): gate7 = "a"
             stage = backNext(stage, 6, 8, gate7)
 
+        # Show direction instructions
         if stage < 7.5:
             gate45= ""
             direction_list1 = []
@@ -611,9 +653,7 @@ def main():
             box11 = pygame.Rect(width - 110, 0, 110, 20)
             # create buttons: walking, bus, transit(walking + bus)
             # user clicks 1 of them to set their travelling mode
-
             drawTextCenter("Calibri", "BACK", BLACK, None, 25, width - 50, 20, True)
-
             size = (100, 100)
             y_image = height//8
             # walk
@@ -628,7 +668,6 @@ def main():
                 if walk_image_rect.collidepoint(mouse): walk_active = 2
                 else:
                     if scroll_bar_active == False and not box11.collidepoint(mouse): walk_active = 0
-
 
             # car
             car_image = pygame.transform.scale(pygame.image.load("car.png"), size)
@@ -657,6 +696,7 @@ def main():
                 else:
                     if scroll_bar_active == False and not box11.collidepoint(mouse): bus_active = 0
 
+            # if one of 3 icons is clicked
             chosen = walk_active == 2 or car_active == 2 or bus_active == 2
             if chosen:
                 gate75 = "a"
@@ -670,34 +710,49 @@ def main():
                     y_dif = 40
                     y_top = height//2.7
                     steps = []
-
+                    duration_distance = ["", ""]
                     if walk_active == 2:
                         directions_result = get_directions(address1, address2, "walking")
+                        duration_distance = get_distance_and_duration(address1, address2, "walking")
                         steps = get_steps_not_transit(directions_result)
-
                     elif car_active == 2:
                         directions_result = get_directions(address1, address2, "driving")
                         steps = get_steps_not_transit(directions_result)
+                        duration_distance = get_distance_and_duration(address1, address2, "driving")
                     elif bus_active == 2:
                         directions_result = get_directions(address1, address2, "transit")
                         steps = get_steps_transit(directions_result)
+                        duration_distance = get_distance_and_duration(address1, address2, "transit")
                     elif walk_active != 2 and car_active != 2 and bus_active != 2:
                         direction_list = []
                     direction_list1 = directionList(steps, width//6, width - width//6)
-                    print(direction_list1)
+                    # total distance, total duration -> d_d
+                    d_d = ""
+                    if duration_distance[0] != "":
+                        d_d = "Total distance: " + duration_distance[0] + ", total time: " + duration_distance[1]
+                    direction_list1 = [d_d] + direction_list1
                     num = len(direction_list1)
                     end = max(height, 60 + num * y_dif)
                     top = height//2.7
+                    # in case the text zone is not enough for displaying instructions, use scroll bar
                     if end > height:
+                        # scroll bar materials
                         scroll_bar_left = width//1.2 + 60
                         scroll_bar = pygame.Rect(scroll_bar_left, scroll_bar_top, scroll_bar_width, scroll_bar_height)
                         scroll_bar_region = pygame.Rect(scroll_bar_left, height//2.7, scroll_bar_width, height)
                         scroll_bar_color = (200, 200, 200)
+
+                        # scroll bar zone
                         end_view_point = end - y_top
                         end_scroll_bar = (height - y_top) - scroll_bar_height
                         ratio = (scroll_bar.y - y_top) / end_scroll_bar
+                        # top: extremely important for displaying instrucitons
+                        # Imagine that the instruction is written on a long paper, and the frame only fits a particular part of it
+                        # Here, screen is the frame
                         top = end_view_point * ratio + y_top
                         pygame.draw.rect(screen, scroll_bar_region_color, scroll_bar_region)
+
+                        # change the color, active state of the scroll bar
                         if scroll_bar.collidepoint(mouse):
                             scroll_bar_color = scroll_bar_color_active
                             if mouseClicked:
@@ -713,6 +768,7 @@ def main():
                         scroll_bar = pygame.Rect(scroll_bar_left, scroll_bar_top, scroll_bar_width, scroll_bar_height)
                         pygame.draw.rect(screen, scroll_bar_color, scroll_bar)
 
+                    # displa all texts
                     for index, text in enumerate(direction_list1):
                         font1 = pygame.font.SysFont("Calibri", 25)
                         direction1 = font1.render(text, True, BLACK, None)
@@ -721,6 +777,7 @@ def main():
                         box1.x, box1.y = width//6, y_pos
                         screen.blit(direction1, box1)
 
+            # hide the texts behind 3 icons
             cover_box = pygame.Rect(0,0, width, height//2.7)
             if not chosen:
                 gate75 = ""
@@ -793,6 +850,7 @@ def main():
             username.rect = username_rect
             username.update(events)
             screen.blit(username.get_surface(), username.rect)
+
             # password
             drawTextTopLeft("Calibri", "Password: ", 30, BLACK, None, width//3.5, height//2)
             password_rect = pygame.Rect(box1.right + 20, height//2, 300, 30)
@@ -800,16 +858,19 @@ def main():
             password.rect = password_rect
             password.update(events)
             screen.blit(password.get_surface(), password.rect)
+
             # encode username and password
             real_username = username.input_string[1:]
             encoded_username = base64.b64encode(real_username.encode())
             real_password = password.input_string
             encoded_password = base64.b64encode(real_password.encode())
 
+            # check if encoded password and username is valid
             admin_accounts = list(admin_data["Admin"])
             passwords = list(admin_data["Password"])
             check1 = check_account(str(encoded_username), str(encoded_password), admin_accounts, passwords)
 
+            # login button
             login_button = pygame.Rect(0, 0, 200, 50)
             login_button.center = (width//2, height//1.5)
             pygame.draw.rect(screen, (116, 153, 228), login_button)
@@ -823,6 +884,7 @@ def main():
             if check9 == 2:
                 drawTextTopLeft("Corbel", "Invalid username or password!", 20, RED, None, width//3.5, height//1.8)
 
+            # back to home page
             home = pygame.Rect(width - 100, 0, 100, 40)
             pygame.draw.rect(screen, (180, 180, 180), home)
             if home.collidepoint(mouse):
@@ -846,6 +908,7 @@ def main():
             top = height//5
             gap = height//10
 
+            # Canteen input box
             box1 = drawTextTopLeft("Calibri", "Canteen: ", 30, BLACK, None, left, top)
             canteen_rect = pygame.Rect(box1.right + 20, top, width//(4/3) - box1.w, 30)
             pygame.draw.rect(screen, BLACK, canteen_rect, 2)
@@ -853,6 +916,7 @@ def main():
             canteen_fix.update(events)
             screen.blit(canteen_fix.get_surface(), canteen_fix.rect)
 
+            # Stall input box
             drawTextTopLeft("Calibri", "Stall: ", 30, BLACK, None, left, top + gap)
             stall_rect = pygame.Rect(box1.right + 20, top + gap, width//(4/3) - box1.w, 30)
             pygame.draw.rect(screen, BLACK, stall_rect, 2)
@@ -860,6 +924,7 @@ def main():
             stall_fix.update(events)
             screen.blit(stall_fix.get_surface(), stall_fix.rect)
 
+            # Dish input box
             drawTextTopLeft("Calibri", "Dish: ", 30, BLACK, None, left, top + gap*2)
             dish_rect = pygame.Rect(box1.right + 20, top + gap*2, width//(4/3) - box1.w, 30)
             pygame.draw.rect(screen, BLACK, dish_rect, 2)
@@ -899,7 +964,7 @@ def main():
                 stage = max(stage_add, stage_edit, stage_remove)
 
 
-       # ADD
+        # ADD
         if stage != 11:
             allowed11 = 0
         if stage not in [11, 12, 13]:
@@ -918,6 +983,7 @@ def main():
                 folder1_rect.center = (width//2, height//1.7)
                 screen.blit(folder1, folder1_rect)
             else:
+                # FOOD TYPE
                 box1 = drawTextTopLeft("Calibri", "Food Type: ", 30, BLACK, None, left, top)
                 foodtype_rect = pygame.Rect(box1.right + 20, top, width//(4/3) - box1.w, 30)
                 pygame.draw.rect(screen, BLACK, foodtype_rect, 2)
@@ -939,9 +1005,9 @@ def main():
                 rating_fix.update(events)
                 screen.blit(rating_fix.get_surface(), rating_fix.rect)
 
+                # check if the detail info is valid to update
                 a1 = price_fix.input_string[1:].replace(".", "", 1)
                 a2 = rating_fix.input_string[1:]
-
                 check = a1.isdigit() and a2.isdigit() and int(a2) in range(0,6)
 
                 submit = pygame.Rect(0, 0, 200, 50)
@@ -951,7 +1017,7 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            add(ws,[info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
+                            ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
@@ -1008,7 +1074,9 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            edit(ws, result[0],foodtype_fix.input_string[1:],float(price_fix.input_string[1:]), int(a2))
+                            ws.cell(row = result[0], column = 6, value = int(a2))
+                            ws.cell(row = result[0], column = 5, value = float(price_fix.input_string[1:]))
+                            ws.cell(row = result[0], column = 1, value = foodtype_fix.input_string[1:])
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
@@ -1017,7 +1085,7 @@ def main():
                 drawTextCenter("Corbel", "SUBMIT", BLACK, None, 40, width//2, height//1.5, True)
                 if allowed12 == 2:
                     drawTextCenter("Calibri", "Please check or type your inputs again.", BLUE, None, 25, width//2, height//2, False)
-                    
+
         # REMOVE
         if stage == 13:
             screen.fill(WHITE)
@@ -1082,12 +1150,9 @@ def main():
                 if mouseClickedUp:
                     stage = 1
 
-
-
-
         pygame.display.update()
         clock.tick(FPS)
-
+# return the box with exact location of the option_i in the food_list
 def get_place(index):
     row = index//5
     col = index % 5
@@ -1101,12 +1166,14 @@ def get_place(index):
     back_box = pygame.Rect(x_pos, y_pos, box_width, box_height)
     return back_box
 
+# draw the box of option based on its location from get_place
 def drawBoxOption(box, color, border):
     x, y, width1, height1 = box
     radius = min(width, height)//50
     drawRoundedRectangle(border, x, y, width1, height1, radius)
     drawRoundedRectangle(color, x+2, y+2, width1-4, height1-4, radius-2)
 
+# draw a shape of the box in drawBoxOption
 def drawRoundedRectangle(color, x, y, width, height, radius):
     diameter = 2*radius
     pygame.draw.rect(screen, color, (x+radius, y, width - diameter, radius))
@@ -1117,7 +1184,8 @@ def drawRoundedRectangle(color, x, y, width, height, radius):
     pygame.draw.ellipse(screen, color, (x, y + height - diameter, diameter, diameter))  # bot-left quarter circle
     pygame.draw.ellipse(screen, color, (x + width - diameter, y + height - diameter, diameter, diameter))
 
-def drawOptions(index, color, border): # draw the box with its text in the middle
+# draw the box with its text in the middle
+def drawOptions(index, color, border):
     name = food_list[index]
     box = get_place(index)      # find its proper place
     font1 = pygame.font.SysFont("Calibri",box.width//6)
@@ -1127,6 +1195,7 @@ def drawOptions(index, color, border): # draw the box with its text in the middl
     drawBoxOption(box, color, border)
     screen.blit(text, textbox)
 
+# return a pygame.Rect with its text due to its left and top
 def drawTextTopLeft(font, text, size, color, background, x_pos, y_pos):
     font1 = pygame.font.SysFont(font, size)
     text1 = font1.render(text, True, color, background)
@@ -1135,6 +1204,7 @@ def drawTextTopLeft(font, text, size, color, background, x_pos, y_pos):
     screen.blit(text1, (x_pos, y_pos))
     return rect1
 
+# return a pygame.Rect with its text due to its right and top, including border
 def drawTextTopRight(font, text, size, color, background, border, x_pos, y_pos):
     font1 = pygame.font.SysFont(font, size)
     text1 = font1.render(text, True, color, background)
@@ -1144,6 +1214,7 @@ def drawTextTopRight(font, text, size, color, background, border, x_pos, y_pos):
     pygame.draw.rect(screen, border, rect1, 2)
     return rect1
 
+# 2 buttons to change stages
 def backNext(stage, b, n, value):
     new_stage = stage
     next = drawTextTopRight("Arial", " NEXT ", 20, BLACK, L_GRAY, BLACK, width, 0)
@@ -1154,6 +1225,7 @@ def backNext(stage, b, n, value):
         new_stage = b
     return new_stage
 
+# primary input box
 class TextBox(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -1177,6 +1249,7 @@ class TextBox(pygame.sprite.Sprite):
                 self.text += " "
         self.image = self.font.render(self.text, True, [0, 0, 0])
 
+# rating part of stage 2
 def drawRating(max_rating):
     minx = width//1.7
     margin = width//50
@@ -1193,6 +1266,7 @@ def drawRating(max_rating):
         list_of_star.append(rect)
     return list_of_star + [goldenstar, bluestar]
 
+# return a pygame.Rect with its text due to its center
 def drawTextCenter(font, text, color, background, size, x_center, y_center, bold1):
     font_text = pygame.font.SysFont(font, size, bold = bold1)
     textSrf = font_text.render(text, True, color, background)
@@ -1201,12 +1275,14 @@ def drawTextCenter(font, text, color, background, size, x_center, y_center, bold
     screen.blit(textSrf, textbox)
     return textbox
 
+# return a pygame.Rect with its border, no fill
 def drawBorderCenter(rect_w, rect_h, x_center, y_center, color, border):
     rect = pygame.Rect(0, 0, rect_w, rect_h)
     rect.center = (x_center, y_center)
     pygame.draw.rect(screen, color, rect, border)
     return rect
 
+# change input type and display of user inputs
 def process_input(x):
     input1 = x
     if x == "" or x == " ":
@@ -1300,6 +1376,7 @@ def drawCanteenBoxes(canteen_list, image_list, result, distance_active): # later
             break
     return chosen_canteen1
 
+# change the active state of a pygame.Rect
 def get_active(box, active):
     new_active = active
     if mouseClicked:
@@ -1364,11 +1441,13 @@ def checkMap(list1, list2, name, processed_mouse):
             break
     return name1
 
+# return the location of mouse on generateMap() due to its original location on screen
 def processMouse(top_image, left_image, image_width, image_height, mouse):
     x1 = round((mouse[0] - left_image)*900/image_width, 0)
     y1 = round((mouse[1] - top_image)*636/image_height, 0)
     return x1, y1
 
+# auto center and resize the image to keep its original ratio
 def display_image(image, top_image, left_image, width, height):
     screen_ratio = width/height
     true_width = image.get_width()
@@ -1517,6 +1596,7 @@ def drawDishBox(dish, price, x_dish, x_price, dish_width, price_width, box_heigh
     drawTextCenter("Calibri", price, BLACK, None, 25, x_price, y_pos, bold1)
     return [menu_box, price_box, new_dish, new_price]
 
+# I dont even know why I create this function
 def switchPage(page):
     new_page = page
     size = width//30
@@ -1583,6 +1663,7 @@ def checkTime(current_time, chosen_canteen):
     else:
         drawTextTopLeft("Calibri", "Let's go!!! It's just {}:{:02d}.".format(hour, minute), 25, BLUE, None, left, top)
 
+# cut down line if it is too long
 def lineDown(left, right, text, font1, size):
     def getWidth(text1):
         font2 = pygame.font.SysFont(font1, size)
@@ -1614,9 +1695,6 @@ def directionList(steps, left, right):
         direction_list = lineDown(left, right, step["direction"], "Calibri", 25)
         list1 += direction_list + [step["distance"]] + [""]
     return list1
-
-
-
 
 if __name__ == '__main__':
     main()
