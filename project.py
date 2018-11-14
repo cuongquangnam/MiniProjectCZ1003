@@ -1,15 +1,16 @@
 import pygame, sys, time, math, base64
 import numpy as np
 import pandas as pd
+import googlemaps
 import datetime
 import openpyxl
 from pygame.locals import *
 
 from function import *
 from input_box3 import *
+from direction import *
+
 pygame.init()
-
-
 
 # color
 WHITE   = (255, 255, 255)
@@ -44,7 +45,8 @@ food_list = [
 
 def main():
     FPS = 60
-    global screen, clock, mouse, shiftDown, width, height, space, backspace, max_rating, mouseClicked, mouseClickedUp
+    global screen, clock, mouse, shiftDown, width, height, space,\
+            backspace, max_rating, mouseClicked, mouseClickedUp, scroll_bar_top, scroll_bar_active, dif_bar
     # all stage materials
     width = 900
     height = 636
@@ -114,10 +116,27 @@ def main():
     allowed11 = 0
     allowed12 = 0
 
+    # stage 16: map instruction
+    walk_active = 0
+    car_active = 0
+    bus_active = 0
+    direction_list1 = []
+    scroll_bar_width = 20
+    scroll_bar_height = 80
+
+    scroll_bar_top = height//2.7
+
+
+    scroll_bar_color_active = (160, 160, 160)
+    scroll_bar_color_clicked = (105, 105, 105)
+    scroll_bar_region_color = (231, 231, 231)
+    scroll_bar_active = False
+
     # start of loop
     while True:
         mouseClicked = False
         mouseClickedUp = False
+        mouseMove = False
         shiftDown = False
         backspace = False
         space = False
@@ -131,9 +150,15 @@ def main():
             # if event.type == MOUSEMOTION:
             #     mouse = event.pos
             if event.type == MOUSEBUTTONDOWN:
-                mouseClicked = True
-            if event.type == MOUSEBUTTONUP:
-                mouseClickedUp = True
+
+                if event.button == 4: scroll_bar_top = max(0, scroll_bar_top - 30)
+                elif event.button == 5: scroll_bar_top = min(height - scroll_bar_height, scroll_bar_top + 30)
+                elif event.button == 1:
+                    mouseClicked = True
+            elif event.type == MOUSEBUTTONUP:
+                if event.button == 1: mouseClickedUp = True
+            elif event.type == pygame.MOUSEMOTION:
+                mouseMove = True
             if event.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 width, height = event.w, event.h
@@ -361,6 +386,15 @@ def main():
             if map_box.collidepoint(mouse) and mouseClicked: stage = 4
             stage = backNext(stage, 2, 5, chosen_canteen)
 
+            home = pygame.Rect(width - 100, height - 40, 100, 40)
+            pygame.draw.rect(screen, (180, 180, 180), home)
+            if home.collidepoint(mouse):
+                pygame.draw.rect(screen, L_GRAY, home)
+                if mouseClickedUp:
+                    stage = 16
+            pygame.draw.rect(screen, BLACK, home, 1)
+            drawTextCenter("Calibri", "BACK", BLACK, None, 25, width - 50, height - 20, True)
+
         # stage 4: map
         if stage == 4:
             list_of_boxes, list_of_names = generateMap()
@@ -524,6 +558,7 @@ def main():
             pygame.draw.rect(screen, RED, box11, 2)
             if mouseClicked and not box11.collidepoint(mouse): gate7 = "a"
             stage = backNext(stage, 6, 8, gate7)
+
         # Do you want to update infomation ?
         if stage == 8:
             screen.fill(WHITE)
@@ -816,6 +851,7 @@ def main():
             pygame.draw.rect(screen, BLACK, submit, 2)
             drawTextCenter("Corbel", "SUBMIT", BLACK, None, 40, width//2, height//1.5, True)
 
+        # Continue ???
         if stage == 14:
             screen.fill(WHITE)
             box_width = 120
@@ -845,6 +881,7 @@ def main():
             pygame.draw.rect(screen, BLACK, no_box, 1)
             drawTextCenter("Comic Sans MS", "NO", BLACK, None, 40, width//2 + 70, height//2, False)
 
+        # Thank you
         if stage == 15:
             screen.fill((110, 205, 227))
             thankyou = pygame.image.load("thankyou.png")
@@ -856,7 +893,149 @@ def main():
                 screen.blit(thankyou, thankyou_rect)
                 box = drawTextCenter("Calibri", "Home", YELLOW, None, 45, width//2, height//1.5, False)
                 if mouseClickedUp:
-                    stage = 1
+                    stage = 16
+
+        # Show direction instructions
+        if stage == 16:
+            screen.fill(WHITE)
+            # create buttons: walking, bus, transit(walking + bus)
+            # user clicks 1 of them to set their travelling mode
+
+            home = pygame.Rect(width - 100, 0, 100, 40)
+            pygame.draw.rect(screen, (180, 180, 180), home)
+            if home.collidepoint(mouse):
+                pygame.draw.rect(screen, L_GRAY, home)
+                if mouseClickedUp:
+                    stage = 4
+            pygame.draw.rect(screen, BLACK, home, 1)
+            drawTextCenter("Calibri", "BACK", BLACK, None, 25, width - 50, 20, True)
+
+            size = (100, 100)
+            y_image = height//8
+            # walk
+            walk_image = pygame.transform.scale(pygame.image.load("walk.png"), size)
+            walk_image_rect = walk_image.get_rect()
+            walk_circle = pygame.Rect(0, 0, 150, 150)
+            walk_image_rect.center = walk_circle.center = (width//4, y_image)
+            if walk_active != 2:
+                if walk_circle.collidepoint(mouse): walk_active = 1
+                else: walk_active = 0
+            if mouseClicked:
+                if walk_image_rect.collidepoint(mouse): walk_active = 2
+                else: walk_active = 0
+            screen.blit(walk_image, walk_image_rect)
+            if walk_active == 1:
+                pygame.draw.ellipse(screen, BLACK, walk_circle, 3)
+            elif walk_active == 2:
+                pygame.draw.ellipse(screen, BLUE, walk_circle, 3)
+
+            # car
+            car_image = pygame.transform.scale(pygame.image.load("car.png"), size)
+            car_image_rect = car_image.get_rect()
+            car_circle = pygame.Rect(0, 0, 150, 150)
+            car_image_rect.center = car_circle.center = (width//2, y_image)
+
+            if car_active != 2:
+                if car_circle.collidepoint(mouse): car_active = 1
+                else: car_active = 0
+            if mouseClicked:
+                if car_image_rect.collidepoint(mouse): car_active = 2
+                else: car_active = 0
+            screen.blit(car_image, car_image_rect)
+            if car_active == 1:
+                pygame.draw.ellipse(screen, BLACK, car_circle, 3)
+            elif car_active == 2:
+                pygame.draw.ellipse(screen, BLUE, car_circle, 3)
+
+            # bus (transit)
+            bus_image = pygame.transform.scale(pygame.image.load("bus.png"), size)
+            bus_image_rect = bus_image.get_rect()
+            bus_circle = pygame.Rect(0, 0, 150, 150)
+            bus_image_rect.center = bus_circle.center = (width//(4/3), y_image)
+            screen.blit(bus_image, bus_image_rect)
+            if bus_active == 1:
+                pygame.draw.ellipse(screen, BLACK, bus_circle, 3)
+            elif bus_active == 2:
+                pygame.draw.ellipse(screen, BLUE, bus_circle, 3)
+
+            if bus_active != 2:
+                if bus_circle.collidepoint(mouse): bus_active = 1
+                else: bus_active = 0
+            if mouseClicked:
+                if bus_image_rect.collidepoint(mouse): bus_active = 2
+                else: bus_active = 0
+
+
+
+            chosen = walk_active == 2 or car_active == 2 or bus_active == 2
+            if not chosen:
+                drawTextCenter("Calibri", "Please click one.", BLUE, None, 30, width//2, height//3.1, False)
+            else:
+                if place == "":
+                    drawTextCenter("Calibri", "You haven't chose your location!", BLUE, None, 30, width//2, height//3.1, False)
+                else:
+                    x, y = process_place(place)
+                    lat_lng = pixeltolatlng(x, y) # return tuple
+                    address1 = lat_lng
+                    address2 = chosen_canteen + "Nanyang Technological University"
+                    y_dif = 40
+                    y_top = height//2.8
+                    steps = []
+
+                    if walk_active == 2:
+                        directions_result = get_directions(address1, address2, "walking")
+                        steps = get_steps_not_transit(directions_result)
+
+                    elif car_active == 2:
+                        directions_result = get_directions(address1, address2, "driving")
+                        steps = get_steps_not_transit(directions_result)
+                    elif bus_active == 2:
+                        directions_result = get_directions(address1, address2, "transit")
+                        steps = get_steps_transit(directions_result)
+                    elif walk_active != 2 and car_active != 2 and bus_active != 2:
+                        direction_list = []
+                    direction_list1 = directionList(steps, width//6, width - width//6)
+                    num = len(direction_list1)
+                    end = max(height, 60 + num * y_dif)
+                    top = height//2.7
+                    if end > height:
+                        scroll_bar_left = width//1.2 + 60
+                        scroll_bar = pygame.Rect(scroll_bar_left, scroll_bar_top, scroll_bar_width, scroll_bar_height)
+                        scroll_bar_region = pygame.Rect(scroll_bar_left, height//2.7, scroll_bar_width, height)
+                        scroll_bar_color = (200, 200, 200)
+                        end_view_point = end - height
+                        end_scroll_bar = height - scroll_bar_height
+                        ratio = scroll_bar.y / end_scroll_bar
+                        top = end_view_point * ratio + 30
+                        pygame.draw.rect(screen, scroll_bar_region_color, scroll_bar_region)
+                        if scroll_bar.collidepoint(mouse):
+                            scroll_bar_color = scroll_bar_color_active
+                            if mouseClicked:
+                                scroll_bar_active = True
+                                dif = mouse[1] - scroll_bar_top
+                        if mouseClickedUp:
+                            scroll_bar_active = False
+                        if mouseMove and scroll_bar_active:
+                            scroll_bar_top = max(y_top, min(mouse[1] - dif, height - scroll_bar_height))
+                        if scroll_bar_active:
+                            scroll_bar_color = scroll_bar_color_clicked
+
+                        scroll_bar = pygame.Rect(scroll_bar_left, scroll_bar_top, scroll_bar_width, scroll_bar_height)
+                        pygame.draw.rect(screen, scroll_bar_color, scroll_bar)
+
+                    for index, text in enumerate(direction_list1):
+                        font1 = pygame.font.SysFont("Calibri", 25)
+                        direction1 = font1.render(text, True, BLACK, None)
+                        box1 = pygame.Rect(0,0, 300, 50)
+                        y_pos = 2*y_top - top + index*(height//20)
+                        box1.x, box1.y = width//6, y_pos
+                        screen.blit(direction1, box1)
+
+
+
+
+
+
 
         pygame.display.update()
         clock.tick(FPS)
@@ -1082,7 +1261,6 @@ def get_active(box, active):
             new_active = False
     return new_active
 
-
 def generateMap():
     hall1 = pygame.Rect(700, 391, 66, 52)
     hall2 = pygame.Rect(546, 291, 110, 54)
@@ -1116,6 +1294,15 @@ def generateMap():
                     grad1, grad2, south, north, nie, north_hill, wave]
     list_of_name = ["Hall 1", "Hall 2", "Hall 3", "Hall 4", "Hall 5", "Hall 6", "Hall 7", "Hall 8", "Hall 9",
                     "Hall 10", "Hall 11", "Hall 12", "Hall 13", "Hall 14", "Hall 15", "Hall 16", "Tamarind Hall",
+                    "Pioneer Hall", "Cresent Hall", "Graduate 1", "Graduate 2", "South spine", "North spine", "NIE",
+                    "North Hill", "The Wave"]
+    return list_of_box, list_of_name
+
+    list_of_box = [hall1, hall2, hall3, hall4, hall5, hall6, hall7, hall8, hall9, hall10,
+                    hall11, hall12, hall13, hall14, hall15, hall16, std_hostel, cresent, pioneer,
+                    grad1, grad2, south, north, nie, north_hill, wave]
+    list_of_name = ["Hall 1", "Hall 2", "Hall 3", "Hall 4", "Hall 5", "Hall 6", "Hall 7", "Hall 8", "Hall 9",
+                    "Hall 10", "Hall 11", "Hall 12", "Hall 13", "Hall 14", "Hall 15", "Hall 16", "Student hostel",
                     "Pioneer Hall", "Cresent Hall", "Graduate 1", "Graduate 2", "South spine", "North spine", "NIE",
                     "North Hill", "The Wave"]
     return list_of_box, list_of_name
@@ -1347,6 +1534,41 @@ def checkTime(current_time, chosen_canteen):
         drawTextTopLeft("Calibri", "Wow! You woke up so early! Have some exercises first.", 25, BLUE, None, left, top)
     else:
         drawTextTopLeft("Calibri", "Let's go!!! It's just {}:{:02d}.".format(hour, minute), 25, BLUE, None, left, top)
+
+def lineDown(left, right, text, font1, size):
+    def getWidth(text1):
+        font2 = pygame.font.SysFont(font1, size)
+        text2 = font2.render(text1, True, BLACK)
+        rect2 = text2.get_rect()
+        return rect2.width
+
+    range = right - left
+    char_width = getWidth("m")
+    limit1 = range//char_width
+    limit = limit1
+    new_text = text
+    result = []
+    if getWidth(new_text) > range:
+        while getWidth(new_text) > range:
+            cut_text = new_text[:limit1]
+            new_text = new_text[limit1:]
+            while getWidth(cut_text) < range and limit < len(text):
+                cut_text += new_text[0]
+                new_text = new_text[1:]
+            result.append(cut_text)
+        result += [new_text]
+        return result
+    else: return [text]
+
+def directionList(steps, left, right):
+    list1 = []
+    for step in steps:
+        direction_list = lineDown(left, right, step["direction"], "Calibri", 25)
+        list1 += direction_list + [step["distance"]] + [""]
+    return list1
+
+
+
 
 if __name__ == '__main__':
     main()

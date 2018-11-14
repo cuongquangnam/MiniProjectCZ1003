@@ -42,8 +42,8 @@ def searchfood(foodtype, pricerange, rating, search, df):
     pricecond2 = search_df['Price'] <= high_price
     search_df = search_df[ pricecond1 & pricecond2 ]
     # filter by rating, shows all above specified rating
+    if rating != 0:
         ratingcond = search_df['Rating'] >= rating
-        if rating != 0:
         search_df = search_df[ ratingcond ]
     # filter by menu Item
     if search != ' ':
@@ -53,7 +53,6 @@ def searchfood(foodtype, pricerange, rating, search, df):
             search_df = search_df[wordcond]
     # return the filtered DataFrame
     return search_df
-
 #function to sort by rating given the DataFrame filtered, the output is a list of indexes
 def sort_by_rating(filter_df):
     return filter_df.sort_values("Rating")
@@ -109,10 +108,11 @@ t1 = result.loc["NIE"]
 # print(type(t1[3]))
 
 
-result = searchfood([],[0.0,100.0],0,'pork', df)
+result = searchfood([],[0.0,100.0],0,'burger', df)
 # t = sort_by_location((333,222), result, infocan)
 t = sort_by_price(result)
 u = sort_by_rating(result)
 # print(result.loc["Canteen 9", "Stall"])
-a = search(ws, ("1", "1", "1"))
-print(a)
+# print(result)
+canteen = "Canteen 2"
+t1 = infocan.loc[canteen, ["Open", "Closed"]]
