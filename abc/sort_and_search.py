@@ -3,34 +3,24 @@ import numpy as np
 from pandas import DataFrame
 import openpyxl
 
+#loading DataFrame from Excel files
 df = pd.read_excel('canteen_db.xlsx')
 infocan = pd.read_excel('canteen details.xlsx')
 admin_data = pd.read_excel("Admin.xlsx")
+
+#loading the worksheet from the excel file
 wb = openpyxl.load_workbook('Canteen_db - Copy.xlsx')
 ws = wb['Sheet1']
 
+#set the name of the canteens to be the indexes of infocan and df
 infocan = infocan.set_index('Canteen')
 df = df.set_index(['Canteen'])
+
 #takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], the search term
-# rating = int(1 to 5) or 0 if not specified
-
-def search(ws, lst):
-    rows = []
-    for row_num in range (2, ws.max_row+1):
-        can = ws.cell(row = row_num, column = 1).value
-        stall = ws.cell(row = row_num, column = 3).value
-        food = ws.cell(row = row_num, column = 4).value
-        #if lst[2] == 'n' then we just need to assign a value to food
-        #suc that food == lst[2]
-        if lst[2] == 'n':
-            food = 'n'
-        if can == lst[0] and stall == lst[1] and food == lst[2]:
-            rows.append(row_num)
-    return rows
-
+#rating = int(1 to 5) or 0 if not specified
 def searchfood(foodtype, pricerange, rating, search, df):
     #copy the dataframe to temporary.
-    search_df = df.copy()
+    search_df = df
     #filter by foodtype
     if foodtype != []:
         foodcond = search_df['Food Type'].isin(foodtype)
@@ -53,13 +43,16 @@ def searchfood(foodtype, pricerange, rating, search, df):
             search_df = search_df[wordcond]
     # return the filtered DataFrame
     return search_df
-#function to sort by rating given the DataFrame filtered, the output is a list of indexes
+
+#function to sort by rating given the DataFrame filtered, the output is a DataFrame
 def sort_by_rating(filter_df):
     return filter_df.sort_values("Rating")
-#function to sort by price given the DataFrame filtered, the output is a list of indexes
+
+#function to sort by price given the DataFrame filtered, the output is a DataFrame
 def sort_by_price(filter_df):
     return filter_df.sort_values("Price")
-#function to sort by distance based on the user location, the filtered DataFrame and the DataFrame containing
+
+#function to sort by distance based on the user location, the filtered DataFrame and the DataFrame 
 #information about the canteen
 def sort_by_location(user_loc, filter_df, infocan):
     lst_loc = filter_df.index.unique()
@@ -92,27 +85,30 @@ def sort_by_location(user_loc, filter_df, infocan):
     else:
         return pd.DataFrame()
 
+#display only 10 canteens satisfying the sort and search
 def display10(filter_df):
     canteen_list_10 = filter_df.index.unique()[:10]
     return filter_df.loc[canteen_list_10,:]
 
+#if filter_df has only one result for canteen X, its type of location would be np.fload64
+#else it returns a series
 def get_location(filter_df):
     df = filter_df
     if type(filter_df) == np.float64:
         return [df]
     else: return df
 
-result = searchfood(['Western'], [5,5], 1, 'spaghetti', df)
-t = sort_by_location((441,430), result, infocan)
-t1 = result.loc["NIE"]
-# print(type(t1[3]))
-
-
-result = searchfood([],[0.0,100.0],0,'burger', df)
-# t = sort_by_location((333,222), result, infocan)
-t = sort_by_price(result)
-u = sort_by_rating(result)
-# print(result.loc["Canteen 9", "Stall"])
-# print(result)
-canteen = "Canteen 2"
-t1 = infocan.loc[canteen, ["Open", "Closed"]]
+#searching the worksheet to find the row containing the canteen, stall and food
+def search(ws, lst):
+    rows = []
+    for row_num in range (2, ws.max_row+1):
+        can = ws.cell(row = row_num, column = 1).value
+        stall = ws.cell(row = row_num, column = 3).value
+        food = ws.cell(row = row_num, column = 4).value
+        #if lst[2] == 'n' then we just need to assign a value to food
+        #suc that food == lst[2]
+        if lst[2] == 'n':
+            food = 'n'
+        if can == lst[0] and stall == lst[1] and food == lst[2]:
+            rows.append(row_num)
+    return rows
