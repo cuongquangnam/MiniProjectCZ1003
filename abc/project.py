@@ -713,16 +713,16 @@ def main():
                     duration_distance = ["", ""]
                     if walk_active == 2:
                         directions_result = get_directions(address1, address2, "walking")
-                        duration_distance = get_distance_and_duration(address1, address2, "walking")
+                        duration_distance = get_duration_and_distance(directions_result)
                         steps = get_steps_not_transit(directions_result)
                     elif car_active == 2:
                         directions_result = get_directions(address1, address2, "driving")
                         steps = get_steps_not_transit(directions_result)
-                        duration_distance = get_distance_and_duration(address1, address2, "driving")
+                        duration_distance = get_duration_and_distance(directions_result)
                     elif bus_active == 2:
                         directions_result = get_directions(address1, address2, "transit")
                         steps = get_steps_transit(directions_result)
-                        duration_distance = get_distance_and_duration(address1, address2, "transit")
+                        duration_distance = get_duration_and_distance(directions_result)
                     elif walk_active != 2 and car_active != 2 and bus_active != 2:
                         direction_list = []
                     direction_list1 = directionList(steps, width//6, width - width//6)
@@ -1017,7 +1017,11 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
+                            #append the row at the end of the excel file
                             ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
+                            #write into the menu_items files
+                            with open("menu_items.txt", "a") as f:
+                                  f.write(info[2]+"\n")
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
