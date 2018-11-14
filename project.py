@@ -898,7 +898,7 @@ def main():
                 stage = max(stage_add, stage_edit, stage_remove)
 
 
-        # ADD
+       # ADD
         if stage != 11:
             allowed11 = 0
         if stage not in [11, 12, 13]:
@@ -950,7 +950,7 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
+                            add(ws,[info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
@@ -1007,9 +1007,7 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            ws.cell(row = result[0], column = 6, value = int(a2))
-                            ws.cell(row = result[0], column = 5, value = float(price_fix.input_string[1:]))
-                            ws.cell(row = result[0], column = 1, value = foodtype_fix.input_string[1:])
+                            edit(ws, result[0],foodtype_fix.input_string[1:],float(price_fix.input_string[1:]), int(a2))
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
@@ -1018,7 +1016,7 @@ def main():
                 drawTextCenter("Corbel", "SUBMIT", BLACK, None, 40, width//2, height//1.5, True)
                 if allowed12 == 2:
                     drawTextCenter("Calibri", "Please check or type your inputs again.", BLUE, None, 25, width//2, height//2, False)
-
+                    
         # REMOVE
         if stage == 13:
             screen.fill(WHITE)
