@@ -1,19 +1,32 @@
+
 import googlemaps
 import datetime
 
 gmaps = googlemaps.Client(key= 'AIzaSyD7UsgHTKortN9wRHK13_OFtiX9VRWf2ss')
-now = datetime.datetime.now()
+now = datetime.datetime(2018, 11, 16, 13, 00)
 #convert from pixel on the NTU Campus map to latitudes and longitudes
 def pixeltolatlng(x,y):
     lat = 1.356116549 - 0.000026134*y
     lng = 103.676118654 + 0.000015694*x
     return (lat,lng)
 
+# get direction from address 1 to address 2 use certain mode of transport
+def get_distance_and_duration(address1, address2, mode):
+    distance_matrix = gmaps.distance_matrix(address1, address2, mode)
+    elements = distance_matrix['rows'][0]['elements']
+    if elements[0]['status'] != 'ZERO_RESULTS':
+        #get distance
+        distance = elements[0]['distance']['text'] #in meters
+        #get duration
+        duration = elements[0]['duration']['text'] #in second
+        return [distance,duration]
+    else:
+        return[]
+
 #get the directions from google map
 #There are threee selected modes: 'walking', 'driving', 'transit' (meaning there are three ways to implement)
 def get_directions(address1, address2, mode):
-    directions_result = gmaps.directions(address1,\
-    address2, mode = mode, departure_time = now)
+    directions_result = gmaps.directions(address1, address2, mode = mode, departure_time = now)
     return directions_result
 
 #get the steps(not transit) (meaning not using bus)
@@ -27,12 +40,11 @@ def get_steps_not_transit(directions):
         lst_of_steps[i]['direction'] = step['html_instructions'].replace('</b>','').replace('<b>','').\
           replace('</div>','').replace('<div style="font-size:0.9em">','. ')
         #print the duration of the instructions
-        lst_of_steps[i]['duration'] = str(step['duration']['value']//60) +' minutes ' + str(step['duration']['value']%60) +' seconds'
+        lst_of_steps[i]['duration'] = str(step['duration']['value']//60) + ' minutes ' + str(step['duration']['value']%60) + ' seconds'
         #print the distance of the instructions
         lst_of_steps[i]['distance'] = step['distance']['text']
         i += 1
     return lst_of_steps
-
 #get the steps (transit) (meaning maybe using bus (or not))
 def get_steps_transit(directions):
     #in case there is no directions, but actually there are always directions!!!
@@ -52,8 +64,19 @@ def get_steps_transit(directions):
                 lst_of_steps[i]['direction'] = step['html_instructions'].replace('</b>','').replace('<b>','').\
                       replace('</div>','').replace('<div style="font-size:0.9em">','. ')
             #print the duration of the instructions
-            lst_of_steps[i]['duration'] = str(step['duration']['value']//60) + 'minutes ' + str(step['duration']['value']%60) +'seconds'
+            lst_of_steps[i]['duration'] = str(step['duration']['value']//60) + ' minutes ' + str(step['duration']['value']%60) +' seconds'
             #print the distance of the instructions
             lst_of_steps[i]['distance'] = step['distance']['text']
             i += 1
     return lst_of_steps
+#x = float(input('x?: '))
+#y = float(input('y?: '))
+#geocode1 = pixeltolatlng(x,y)
+#print(geocode1)
+#NOTE: to write direction to a canteen, write in this form: 'Canteen X Nanyang Technological University, Singapore'
+# directions = get_directions((1.345506145, 103.687889154),'North Spine Food Court Nanyang Technological University','walking')
+# steps = get_steps_transit(directions)
+# print(steps)
+print(get_distance_and_duration((1.345506145, 103.687889154),'North Spine Food Court Nanyang Technological University','walking'))
+# #print_duration_and_time(directions)
+# print(directions)
