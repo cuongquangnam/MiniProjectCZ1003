@@ -57,7 +57,7 @@ def main():
     mouse = pygame.mouse.get_pos()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
-    pygame.display.set_caption('NTU Food')
+    pygame.display.set_caption('NTU F&B Recommendation')
 
     #stage 2
     # option part
@@ -182,7 +182,7 @@ def main():
             screen.fill((0,167,157))
             cover = pygame.transform.scale(pygame.image.load("cover.jpg"), (900, 636))
             display_image(cover, 0, 0, width, height)
-            drawTextCenter("Comic Sans MS", "NTU Food", YELLOW, None, 35, width//2, height//2, True)
+            drawTextCenter("Comic Sans MS", "NTU F&B", YELLOW, None, 35, width//2, height//2, True)
             # GET START
             box2 = pygame.Rect(0, 0, 250, 50)
             box2.center = (width//2, height//1.4)
@@ -729,7 +729,7 @@ def main():
                     # total distance, total duration -> d_d
                     d_d = ""
                     if duration_distance[0] != "":
-                        d_d = "Total distance: " + duration_distance[0] + ", total time: " + duration_distance[1]
+                        d_d = "Total distance: " + duration_distance[1] + ", total time: " + duration_distance[0]
                     direction_list1 = [d_d] + direction_list1 + [""]
                     num = len(direction_list1)
                     end = max(height, 60 + num * y_dif)
