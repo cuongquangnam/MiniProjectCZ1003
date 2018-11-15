@@ -7,7 +7,7 @@ import openpyxl
 from pygame.locals import *
 
 # extract functions and data from others file
-from function import *
+from sort_and_search import *
 from input_box3 import *
 from direction import *
 from spellchecker import *
@@ -713,16 +713,16 @@ def main():
                     duration_distance = ["", ""]
                     if walk_active == 2:
                         directions_result = get_directions(address1, address2, "walking")
-                        duration_distance = get_duration_and_distance(directions_result)
+                        duration_distance = get_distance_and_duration(directions_result)
                         steps = get_steps_not_transit(directions_result)
                     elif car_active == 2:
                         directions_result = get_directions(address1, address2, "driving")
                         steps = get_steps_not_transit(directions_result)
-                        duration_distance = get_duration_and_distance(directions_result)
+                        duration_distance = get_distance_and_duration(directions_result)
                     elif bus_active == 2:
                         directions_result = get_directions(address1, address2, "transit")
                         steps = get_steps_transit(directions_result)
-                        duration_distance = get_duration_and_distance(directions_result)
+                        duration_distance = get_distance_and_duration(directions_result)
                     elif walk_active != 2 and car_active != 2 and bus_active != 2:
                         direction_list = []
                     direction_list1 = directionList(steps, width//6, width - width//6)
@@ -730,7 +730,7 @@ def main():
                     d_d = ""
                     if duration_distance[0] != "":
                         d_d = "Total distance: " + duration_distance[0] + ", total time: " + duration_distance[1]
-                    direction_list1 = [d_d] + direction_list1
+                    direction_list1 = [d_d] + direction_list1 + [""]
                     num = len(direction_list1)
                     end = max(height, 60 + num * y_dif)
                     top = height//2.7
@@ -829,7 +829,7 @@ def main():
             if no_box.collidepoint(mouse):
                 pygame.draw.rect(screen, ORANGE, no_box)
                 if mouseClicked:
-                    stage = 1
+                    stage = 15
             pygame.draw.rect(screen, BLACK, no_box, 1)
             drawTextCenter("Comic Sans MS", "NO", BLACK, None, 40, width//2 + 70, height//2, False)
             # text
@@ -1017,11 +1017,7 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            #append the row at the end of the excel file
                             ws.append([info[0],foodtype_fix.input_string[1:], info[1], info[2], float(price_fix.input_string[1:]), int(a2)])
-                            #write into the menu_items files
-                            with open("menu_items.txt", "a") as f:
-                                  f.write(info[2]+"\n")
                             wb.save('Canteen_db - Copy.xlsx')
                             stage = 14
                         else:
@@ -1078,7 +1074,6 @@ def main():
                     pygame.draw.rect(screen, ORANGE, submit)
                     if mouseClickedUp:
                         if check:
-                            #edit the row
                             ws.cell(row = result[0], column = 6, value = int(a2))
                             ws.cell(row = result[0], column = 5, value = float(price_fix.input_string[1:]))
                             ws.cell(row = result[0], column = 1, value = foodtype_fix.input_string[1:])
@@ -1105,7 +1100,6 @@ def main():
                 pygame.draw.rect(screen, ORANGE, submit)
                 if mouseClickedUp:
                     if len(result) > 0:
-                        #remove the row
                         ws.delete_rows(result[0])
                         wb.save('Canteen_db - Copy.xlsx')
                     stage = 14

@@ -1,7 +1,9 @@
+
 import googlemaps
 import datetime
 
 gmaps = googlemaps.Client(key= 'AIzaSyD7UsgHTKortN9wRHK13_OFtiX9VRWf2ss')
+
 now = datetime.datetime.now()
 #convert from pixel on the NTU Campus map to latitudes and longitudes
 def pixeltolatlng(x,y):
@@ -9,8 +11,16 @@ def pixeltolatlng(x,y):
     lng = 103.676118654 + 0.000015694*x
     return (lat,lng)
 
-#get the directions from address 1 to address 2 from google map
-#There are threee selected modes: 'walking', 'driving', 'transit'
+# get duration and distance based on the directions
+def get_distance_and_duration(directions):
+    if directions != []:
+        steps = directions[0]['legs'][0]
+        duration = steps['duration']['text']
+        distance = steps['distance']['text']
+        return [duration, distance]
+
+# get the directions from google map
+# There are threee selected modes: 'walking', 'driving', 'transit' (meaning there are three ways to implement)
 def get_directions(address1, address2, mode):
     directions_result = gmaps.directions(address1, address2, mode = mode, departure_time = now)
     return directions_result
@@ -31,7 +41,6 @@ def get_steps_not_transit(directions):
         lst_of_steps[i]['distance'] = step['distance']['text']
         i += 1
     return lst_of_steps
-
 #get the steps (transit) (meaning maybe using bus (or not))
 def get_steps_transit(directions):
     #in case there is no directions, but actually there are always directions!!!
@@ -55,12 +64,4 @@ def get_steps_transit(directions):
             #print the distance of the instructions
             lst_of_steps[i]['distance'] = step['distance']['text']
             i += 1
-    return lst_of_steps
-
-# get duration and distance based on the directions
-def get_duration_and_distance(directions):
-    if directions != []:
-        steps = directions[0]['legs'][0]
-        duration = steps['duration']['text']
-        distance = steps['distance']['text']
-        return [duration, distance]
+        return lst_of_steps

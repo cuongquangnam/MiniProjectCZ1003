@@ -3,25 +3,25 @@ import numpy as np
 from pandas import DataFrame
 import openpyxl
 
-#loading DataFrame from Excel files
+# loading DataFrame from Excel files
 df = pd.read_excel('canteen_db.xlsx')
 infocan = pd.read_excel('canteen details.xlsx')
 admin_data = pd.read_excel("Admin.xlsx")
 
-#loading the worksheet from the excel file
+# loading the worksheet from the excel file
 wb = openpyxl.load_workbook('Canteen_db - Copy.xlsx')
 ws = wb['Sheet1']
 
-#set the name of the canteens to be the indexes of infocan and df
+#  the name of the canteens to be the indexes of infocan and df
 infocan = infocan.set_index('Canteen')
 df = df.set_index(['Canteen'])
 
-#takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], the search term
-#rating = int(1 to 5) or 0 if not specified
+# takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], the search term
+# rating = int(1 to 5) or 0 if not specified
 def searchfood(foodtype, pricerange, rating, search, df):
-    #copy the dataframe to temporary.
+    # copy the dataframe to temporary.
     search_df = df
-    #filter by foodtype
+    # filter by foodtype
     if foodtype != []:
         foodcond = search_df['Food Type'].isin(foodtype)
         search_df = search_df[foodcond]
@@ -44,28 +44,28 @@ def searchfood(foodtype, pricerange, rating, search, df):
     # return the filtered DataFrame
     return search_df
 
-#function to sort by rating given the DataFrame filtered, the output is a DataFrame
+# function to sort by rating given the DataFrame filtered, the output is a DataFrame
 def sort_by_rating(filter_df):
     return filter_df.sort_values("Rating")
 
-#function to sort by price given the DataFrame filtered, the output is a DataFrame
+# function to sort by price given the DataFrame filtered, the output is a DataFrame
 def sort_by_price(filter_df):
     return filter_df.sort_values("Price")
 
-#function to sort by distance based on the user location, the filtered DataFrame and the DataFrame 
-#information about the canteen
+# function to sort by distance based on the user location, the filtered DataFrame and the DataFrame
+# information about the canteen
 def sort_by_location(user_loc, filter_df, infocan):
     lst_loc = filter_df.index.unique()
     lst_dist = {}
     frames = []
     for loc in lst_loc:
-        #calculate the distance
+        # calculate the distance
         distance = ((user_loc[0] - infocan.loc[loc]['loc x'])**2 + (user_loc[1] - infocan.loc[loc]['loc y'])**2)**(1/2)
-        #convert from bitmap to km (just giving an approximate of the distance)
+        # convert from bitmap to km (just giving an approximate of the distance)
         distance *= 0.0025
-        #create a new column in DataFrame to store all of the distances
+        # create a new column in DataFrame to store all of the distances
         filter_df.at[loc,'Distance'] = distance
-    #sort DataFrame according to the distance
+    # sort DataFrame according to the distance
     filter_df = filter_df.sort_values('Distance')
     # select top 10 location to show the user
     count = 1
@@ -85,12 +85,12 @@ def sort_by_location(user_loc, filter_df, infocan):
     else:
         return pd.DataFrame()
 
-#display only 10 canteens satisfying the sort and search
+# display only 10 canteens satisfying the sort and search
 def display10(filter_df):
     canteen_list_10 = filter_df.index.unique()[:10]
     return filter_df.loc[canteen_list_10,:]
 
-#if filter_df has only one result for canteen X, its type of location would be np.fload64
+# if filter_df has only one result for canteen X, its type of location would be np.fload64
 #else it returns a series
 def get_location(filter_df):
     df = filter_df
@@ -98,7 +98,7 @@ def get_location(filter_df):
         return [df]
     else: return df
 
-#searching the worksheet to find the row containing the canteen, stall and food
+# searching the worksheet to find the row containing the canteen, stall and food
 def search(ws, lst):
     rows = []
     for row_num in range (2, ws.max_row+1):

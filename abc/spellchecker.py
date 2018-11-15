@@ -40,9 +40,3 @@ class SpellChecker:
         return (e2 for e1 in self.edits1(word) for e2 in self.edits1(e1))
 
     #adapted from http://norvig.com/spell-correct.html
-
-   #### we only need to use this commands
-s = SpellChecker()
-#INPUT >>
-print(s.correction('befe')) #command to return most likely spell corrected word
-#OUTPUT>>>> 'chicken'
