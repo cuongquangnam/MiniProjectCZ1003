@@ -2,14 +2,14 @@ import googlemaps
 import datetime
 
 gmaps = googlemaps.Client(key= 'AIzaSyD7UsgHTKortN9wRHK13_OFtiX9VRWf2ss')
-now = datetime.datetime(2018, 11, 16, 13, 00)
+now = datetime.datetime.now()
 #convert from pixel on the NTU Campus map to latitudes and longitudes
 def pixeltolatlng(x,y):
     lat = 1.356116549 - 0.000026134*y
     lng = 103.676118654 + 0.000015694*x
     return (lat,lng)
 
-#get the directions from google map
+#get the directions from address 1 to address 2 from google map
 #There are threee selected modes: 'walking', 'driving', 'transit'
 def get_directions(address1, address2, mode):
     directions_result = gmaps.directions(address1, address2, mode = mode, departure_time = now)
