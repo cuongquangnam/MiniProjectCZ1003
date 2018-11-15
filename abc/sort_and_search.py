@@ -19,7 +19,6 @@ df = df.set_index(['Canteen'])
 # takes in foodtype = ['Food1','food2' etc], pricerange = [lower, higher as floats/int], the search term
 # rating = int(1 to 5) or 0 if not specified
 def searchfood(foodtype, pricerange, rating, search, df):
-    # copy the dataframe to temporary.
     search_df = df
     # filter by foodtype
     if foodtype != []:
