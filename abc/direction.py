@@ -20,7 +20,7 @@ def get_directions(address1, address2, mode):
 
 #get the steps(not transit) (meaning not using bus)
 def get_steps_not_transit(directions):
-    if direction != []:
+    if directions != []:
         steps =  directions[0]['legs'][0]['steps']
         #create a list of [{'direction':....,'duration':...,'distance':...} ]
         lst_of_steps = []
@@ -37,9 +37,11 @@ def get_steps_not_transit(directions):
         return lst_of_steps
     else:
         return []
+
 #get the steps (transit) (meaning maybe using bus (or not))
 def get_steps_transit(directions):
     #in case there is no directions, but actually there are always directions!!!
+    #since both the start and end location is inside NTU
     if directions != []:
         #create a list of [{'direction':....,'duration':...,'distance':...} ]
         lst_of_steps = []
