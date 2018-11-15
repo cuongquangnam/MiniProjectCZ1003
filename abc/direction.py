@@ -9,14 +9,6 @@ def pixeltolatlng(x,y):
     lng = 103.676118654 + 0.000015694*x
     return (lat,lng)
 
-# get duration and distance based on the directions
-def get_duration_and_distance(directions):
-    if directions != []:
-        steps = directions[0]['legs'][0]
-        duration = steps['duration']['text']
-        distance = steps['distance']['text']
-        return [duration, distance]
-
 #get the directions from google map
 #There are threee selected modes: 'walking', 'driving', 'transit'
 def get_directions(address1, address2, mode):
@@ -64,3 +56,11 @@ def get_steps_transit(directions):
             lst_of_steps[i]['distance'] = step['distance']['text']
             i += 1
     return lst_of_steps
+
+# get duration and distance based on the directions
+def get_duration_and_distance(directions):
+    if directions != []:
+        steps = directions[0]['legs'][0]
+        duration = steps['duration']['text']
+        distance = steps['distance']['text']
+        return [duration, distance]
