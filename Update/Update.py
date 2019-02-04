@@ -9,8 +9,8 @@ def login():
     df = pd.read_excel('Admin.xlsx')
     check = False
     while (check == False):
-        admin = input('Admin?')
-        password = input('Password?')
+        admin = input('Admin???')
+        password = input('Password???')
         condadmin = df['Admin account'] == admin
         condpass = df['Password'] == password
         result = df[condadmin & condpass]
