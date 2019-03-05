@@ -41,6 +41,6 @@ to see how you can switch between 25 pages of dishes in the McDonald's menu.
 controlled with wheel on the mouse.
 
 ** Contact
-If there are some errors or questions, please email our group at phatdat001@e.ntu.edu.sg
+If there are some errors or questions, please email our group at phatdat001@e.ntu.edu.sg or congcuon001@e.ntu.edu.sg
 
 
