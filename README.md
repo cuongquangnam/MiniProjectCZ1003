@@ -1,4 +1,5 @@
 This is our project for the course CZ1003: Introduction to Computational Thinking at NTU
+
 ** Special module packages needed to be install
 1) pygame
 2) pandas
