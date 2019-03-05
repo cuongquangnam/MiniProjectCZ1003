@@ -2,7 +2,7 @@
 import googlemaps
 import datetime
 
-gmaps = googlemaps.Client(key= 'YOUR_API_KEY')
+gmaps = googlemaps.Client(key= 'YOUR_GOOGLEMAP_API_KEY')
 
 now = datetime.datetime.now()
 
