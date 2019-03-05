@@ -14,10 +14,12 @@ Please put download all of them in the same folder in order to make sure the cod
 - The main program is run on project.py, other files must come along with the main file to ensure the inner
 codes work well.
 
-- Make sure that your computer is connected to internet to allow the google map api direction works. Otherwise,
+- Make sure that your computer is connected to internet to allow the google map api direction work. Otherwise,
 if you click the "Show direction" button, errors will occur (api would not work)
 
-- About the SpellChecker, cause its database is quite small, it only can suggest words which are reasonably similar
+- To use direction function, you also need to use Google Map API Key.
+
+- About the SpellChecker, because its database is quite small, it only can suggest words which are reasonably similar
 to the user input.
 
 - Log in section:
