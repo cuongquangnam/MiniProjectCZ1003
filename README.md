@@ -1,3 +1,4 @@
+This is our project for the course CZ1003: Introduction to Computational Thinking at NTU
 ** Special module packages needed to be install
 1) pygame
 2) pandas
@@ -10,7 +11,7 @@
 
 * All the materials needed for the program are divided into different parts (images, data,...)
 Please put download all of them in the same folder in order to make sure the codes run well.
-- The main program is ran on project.py, other files must come along with the main file to ensure the inner
+- The main program is run on project.py, other files must come along with the main file to ensure the inner
 codes work well.
 
 - Make sure that your computer is connected to internet to allow the google map api direction works. Otherwise,
